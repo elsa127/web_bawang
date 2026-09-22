@@ -1,0 +1,42 @@
+[
+    {
+        "feature": "B12",
+        "description": "SWIR-2 (Kandungan Air & Bahan Kering)",
+        "importance": 0.2418
+    },
+    {
+        "feature": "B4",
+        "description": "Red (Penyerapan Klorofil Merah)",
+        "importance": 0.2392
+    },
+    {
+        "feature": "B11",
+        "description": "SWIR-1 (Kandungan Air Daun)",
+        "importance": 0.1207
+    },
+    {
+        "feature": "B2",
+        "description": "Blue (Reflektansi Biru)",
+        "importance": 0.1177
+    },
+    {
+        "feature": "NDWI",
+        "description": "Normalized Difference Water Index (Kelembapan)",
+        "importance": 0.0934
+    },
+    {
+        "feature": "B8",
+        "description": "NIR (Biomassa & Seluler Daun)",
+        "importance": 0.0724
+    },
+    {
+        "feature": "B3",
+        "description": "Green (Pantulan Hijau Daun)",
+        "importance": 0.063
+    },
+    {
+        "feature": "NDVI",
+        "description": "Normalized Difference Vegetation Index (Kesehatan Tanaman)",
+        "importance": 0.0517
+    }
+]

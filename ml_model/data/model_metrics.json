@@ -1,0 +1,19 @@
+{
+    "spatial_cv": {
+        "MAE_q_ha": 13.441,
+        "RMSE_q_ha": 17.035,
+        "MAPE_pct": 13.88,
+        "R2": -0.656
+    },
+    "temporal_cv": {
+        "MAE_q_ha": 8.829,
+        "RMSE_q_ha": 11.629,
+        "MAPE_pct": 9.27,
+        "R2": 0.228,
+        "accuracy_approx_pct": 90.73
+    },
+    "temporal_cv_ton_ha": {
+        "MAE_ton_ha": 0.883,
+        "RMSE_ton_ha": 1.163
+    }
+}

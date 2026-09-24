@@ -75,7 +75,6 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2.5 text-brand-800 font-bold text-xl sm:text-2xl tracking-tight">
-                    <span class="text-2xl">🗺️</span>
                     <h2>Peta Lahan Bawang Merah (Kabupaten Nganjuk)</h2>
                 </div>
                 <p class="text-slate-600 text-xs sm:text-sm mt-1">
@@ -130,7 +129,7 @@
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span x-text="mapLayer === 'satellite' ? '🛣️ Tampilan Jalan' : '🛰️ Tampilan Satelit'"></span>
+                <span x-text="mapLayer === 'satellite' ? 'Tampilan Jalan' : 'Tampilan Satelit'"></span>
             </button>
         </div>
 
@@ -210,67 +209,82 @@
 (function () {
 
     // ─────────────────────────────────────────────────────────
-    // Koordinat polygon NYATA berdasarkan batas administrasi
+    // Koordinat polygon berdasarkan batas administrasi
     // kecamatan Nganjuk dari OpenStreetMap / BIG Indonesia
     // ─────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Koordinat disesuaikan berdasarkan titik sampel GEE (Google Earth Engine)
+    // dari notebook ml_model/notebooks/Salinan_dari_qonita_bawang_merah.ipynb
+    // Bounding box GEE: lon 111.8016–112.0112, lat -7.6564 – -7.3953
+    // Titik sampel per kecamatan: Sukomoro ~(111.93–111.98, -7.60–-7.62),
+    //   Bagor ~(111.816–111.884, -7.556–-7.629), Rejoso ~(111.821–111.897, -7.442–-7.570),
+    //   Gondang ~(111.990, -7.579)
+    // ─────────────────────────────────────────────────────────────────────────
     var KECAMATAN = {
         sukomoro: {
-            label: 'Sukomoro ⭐',
-            center: [-7.548, 111.922],
+            label: 'Sukomoro (Sentra)',
+            center: [-7.610, 111.950],
             fillColor: '#4CAF50', strokeColor: '#1B5E20',
             popup: '<b style="font-size:13px;">Sukomoro (Sentra Utama)</b><br><span style="color:#7A1B28;font-weight:700;">Kondisi Sangat Subur</span><br><br>Luas: <b>2,523 Ha</b><br>Produksi BPS: 292,095 Q<br>Aktual: 11.58 T/Ha | Prediksi: <b>10.97 T/Ha</b><br>NDVI: 0.74 | NDWI: -0.47',
-            // Polygon mengikuti batas kecamatan Sukomoro Nganjuk
+            // Polygon batas kecamatan Sukomoro – disesuaikan data GEE
+            // Sampel GEE: lat -7.597~-7.623, lon 111.927~111.985
             coords: [
-                [-7.5120, 111.8980], [-7.5050, 111.9120], [-7.4980, 111.9250],
-                [-7.5020, 111.9380], [-7.5100, 111.9480], [-7.5230, 111.9550],
-                [-7.5380, 111.9580], [-7.5500, 111.9520], [-7.5620, 111.9420],
-                [-7.5700, 111.9280], [-7.5720, 111.9130], [-7.5650, 111.8980],
-                [-7.5520, 111.8880], [-7.5360, 111.8830], [-7.5200, 111.8860],
-                [-7.5120, 111.8980]
+                [-7.5860, 111.9200], [-7.5800, 111.9320], [-7.5760, 111.9440],
+                [-7.5780, 111.9580], [-7.5840, 111.9700], [-7.5950, 111.9810],
+                [-7.6060, 111.9870], [-7.6180, 111.9860], [-7.6290, 111.9780],
+                [-7.6360, 111.9640], [-7.6380, 111.9490], [-7.6310, 111.9350],
+                [-7.6180, 111.9230], [-7.6030, 111.9170], [-7.5900, 111.9160],
+                [-7.5860, 111.9200]
             ]
         },
         bagor: {
             label: 'Bagor',
-            center: [-7.585, 111.872],
+            center: [-7.593, 111.855],
             fillColor: '#66BB6A', strokeColor: '#1B5E20',
             popup: '<b style="font-size:13px;">Bagor</b><br><span style="color:#7A1B28;font-weight:700;">Produktivitas Tertinggi</span><br><br>Luas: <b>4,784 Ha</b><br>Produksi BPS: 571,720 Q<br>Aktual: 11.95 T/Ha | Prediksi: <b>11.04 T/Ha</b><br>NDVI: 0.53 | NDWI: -0.50',
-            // Polygon batas kecamatan Bagor (barat-selatan Nganjuk)
+            // Polygon batas kecamatan Bagor – disesuaikan data GEE
+            // Sampel GEE: lat -7.556~-7.629, lon 111.816~111.884
             coords: [
-                [-7.5430, 111.8480], [-7.5350, 111.8620], [-7.5310, 111.8780],
-                [-7.5360, 111.8920], [-7.5480, 111.9010], [-7.5620, 111.9020],
-                [-7.5730, 111.8940], [-7.5800, 111.8800], [-7.5850, 111.8640],
-                [-7.5870, 111.8480], [-7.5830, 111.8330], [-7.5730, 111.8210],
-                [-7.5590, 111.8150], [-7.5440, 111.8190], [-7.5350, 111.8310],
-                [-7.5330, 111.8420], [-7.5430, 111.8480]
+                [-7.5430, 111.8080], [-7.5360, 111.8210], [-7.5310, 111.8370],
+                [-7.5340, 111.8520], [-7.5450, 111.8660], [-7.5600, 111.8770],
+                [-7.5730, 111.8820], [-7.5860, 111.8810], [-7.6000, 111.8760],
+                [-7.6150, 111.8690], [-7.6290, 111.8590], [-7.6360, 111.8430],
+                [-7.6340, 111.8270], [-7.6240, 111.8130], [-7.6070, 111.8050],
+                [-7.5880, 111.8030], [-7.5690, 111.8060], [-7.5530, 111.8100],
+                [-7.5430, 111.8080]
             ]
         },
         gondang: {
             label: 'Gondang',
-            center: [-7.512, 111.965],
+            center: [-7.560, 111.990],
             fillColor: '#FFA726', strokeColor: '#E65100',
             popup: '<b style="font-size:13px;">Gondang</b><br><span style="color:#E65100;font-weight:700;">Perlu Pantauan Air</span><br><br>Luas: <b>5,502 Ha</b><br>Produksi BPS: 523,154 Q<br>Aktual: 9.51 T/Ha | Prediksi: <b>10.64 T/Ha</b><br>NDVI: 0.54 | NDWI: -0.51',
-            // Polygon batas kecamatan Gondang (timur laut Nganjuk)
+            // Polygon batas kecamatan Gondang – disesuaikan data GEE
+            // Sampel GEE: lat -7.579, lon 111.990
             coords: [
-                [-7.4720, 111.9320], [-7.4680, 111.9480], [-7.4700, 111.9650],
-                [-7.4780, 111.9820], [-7.4900, 111.9950], [-7.5050, 112.0020],
-                [-7.5220, 112.0000], [-7.5380, 111.9920], [-7.5480, 111.9780],
-                [-7.5500, 111.9600], [-7.5430, 111.9440], [-7.5300, 111.9340],
-                [-7.5140, 111.9280], [-7.4960, 111.9270], [-7.4800, 111.9290],
-                [-7.4720, 111.9320]
+                [-7.5190, 111.9620], [-7.5130, 111.9760], [-7.5110, 111.9910],
+                [-7.5160, 112.0050], [-7.5270, 112.0160], [-7.5430, 112.0210],
+                [-7.5600, 112.0190], [-7.5740, 112.0110], [-7.5840, 111.9980],
+                [-7.5880, 111.9820], [-7.5860, 111.9660], [-7.5790, 111.9530],
+                [-7.5670, 111.9440], [-7.5510, 111.9420], [-7.5350, 111.9490],
+                [-7.5240, 111.9570], [-7.5190, 111.9620]
             ]
         },
         rejoso: {
             label: 'Rejoso',
-            center: [-7.490, 111.900],
+            center: [-7.500, 111.868],
             fillColor: '#81C784', strokeColor: '#2E7D32',
             popup: '<b style="font-size:13px;">Rejoso</b><br><span style="color:#7A1B28;font-weight:700;">Kondisi Subur & Stabil</span><br><br>Luas: <b>4,922 Ha</b><br>Produksi BPS: 567,106 Q<br>Aktual: 11.52 T/Ha | Prediksi: <b>10.68 T/Ha</b><br>NDVI: 0.60 | NDWI: -0.55',
-            // Polygon batas kecamatan Rejoso (utara Nganjuk)
+            // Polygon batas kecamatan Rejoso – disesuaikan data GEE
+            // Sampel GEE: lat -7.442~-7.570, lon 111.821~111.897
             coords: [
-                [-7.4580, 111.8700], [-7.4530, 111.8860], [-7.4520, 111.9030],
-                [-7.4580, 111.9200], [-7.4700, 111.9330], [-7.4870, 111.9390],
-                [-7.5040, 111.9340], [-7.5130, 111.9210], [-7.5140, 111.9040],
-                [-7.5070, 111.8880], [-7.4950, 111.8760], [-7.4800, 111.8680],
-                [-7.4650, 111.8660], [-7.4580, 111.8700]
+                [-7.4380, 111.8430], [-7.4320, 111.8590], [-7.4320, 111.8760],
+                [-7.4390, 111.8920], [-7.4530, 111.9040], [-7.4710, 111.9100],
+                [-7.4890, 111.9080], [-7.5050, 111.9010], [-7.5190, 111.8900],
+                [-7.5310, 111.8760], [-7.5380, 111.8590], [-7.5370, 111.8410],
+                [-7.5290, 111.8250], [-7.5150, 111.8130], [-7.4970, 111.8060],
+                [-7.4780, 111.8060], [-7.4600, 111.8140], [-7.4460, 111.8270],
+                [-7.4380, 111.8430]
             ]
         }
     };
@@ -281,7 +295,7 @@
         var el = document.getElementById('leaflet-map');
         if (!el || map) return;
 
-        // Layer satelit Esri (gratis, tidak butuh API key)
+        // Layer satelit Esri (tidak butuh API key)
         var satellite = L.tileLayer(
             'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
             { attribution: '© Esri, USGS, NOAA', maxZoom: 18 }
@@ -294,7 +308,7 @@
         );
 
         map = L.map('leaflet-map', {
-            center: [-7.535, 111.915],
+            center: [-7.555, 111.920],
             zoom: 12,
             layers: [satellite],
             zoomControl: true,

@@ -4,7 +4,6 @@
         <!-- Section Header -->
         <div>
             <div class="flex items-center gap-2.5 text-brand-800 font-bold text-xl sm:text-2xl tracking-tight">
-                <span class="text-2xl">📈</span>
                 <h2>Prediksi Produktivitas Panen</h2>
             </div>
             <p class="text-slate-600 text-xs sm:text-sm mt-1 max-w-2xl">

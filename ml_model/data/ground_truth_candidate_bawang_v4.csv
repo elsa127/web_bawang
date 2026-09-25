@@ -1,0 +1,41 @@
+Sample_ID,Kecamatan,Area_Spesifik,Latitude,Longitude,Label,Kelas_Detail,Confidence,Sumber_GT,Ciri_Visual
+BW001,Sukomoro,Utara Jalan Raya Sukomoro,-7.585102,111.93521,1,Bawang Merah,High,Interpretasi Visual Satelit,"Pola bedengan linier rapat, warna daun hijau kekuningan."
+BW002,Sukomoro,Persawahan Desa Nglundo,-7.586311,111.948305,1,Bawang Merah,High,Interpretasi Visual Satelit,Petak memanjang dengan parit irigasi kecil di antaranya.
+BW003,Sukomoro,Selatan Stasiun Sukomoro,-7.59542,111.946112,1,Bawang Merah,High,Interpretasi Visual Satelit,"Tekstur bergaris tegas, area tanah terbuka di sela tanaman."
+BW004,Sukomoro,Area Timur Pasar Sukomoro,-7.597511,111.947201,1,Bawang Merah,High,Interpretasi Visual Satelit,Lahan intensif dengan bedengan membujur utara-selatan.
+BW005,Sukomoro,Persawahan Desa Kapas,-7.605213,111.938515,1,Bawang Merah,High,Interpretasi Visual Satelit,"Pola hijau terang, kontras dengan persawahan padi sekitarnya."
+BW006,Sukomoro,Blok Pertanian Kapas Barat,-7.606322,111.93641,1,Bawang Merah,High,Interpretasi Visual Satelit,Garis bedengan terlihat jelas pada zoom level tinggi.
+BW007,Sukomoro,Sawah Desa Bungur,-7.581205,111.940125,1,Bawang Merah,High,Interpretasi Visual Satelit,Dominasi lahan merah gembur dengan tunas bawang muda.
+BW008,Sukomoro,Perbatasan Nganjuk Kota,-7.58341,111.931502,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Petak sempit dengan kepadatan tanam tinggi.
+BW009,Sukomoro,Timur Nglundo,-7.588105,111.951214,1,Bawang Merah,Exclude,Interpretasi Visual Satelit,Area lahan terbuka yang disiapkan untuk tanam bawang.
+BW010,Sukomoro,Sawah Selatan Rel KA,-7.59672,111.940315,1,Bawang Merah,High,Interpretasi Visual Satelit,Hamparan bedengan seragam dengan parit air.
+BW011,Rejoso,Persawahan Desa Rejoso,-7.545102,111.88521,1,Bawang Merah,High,Interpretasi Visual Satelit,"Tekstur garis rapat, bedengan membujur timur-barat."
+BW012,Rejoso,Area Pertanian Banjarejo,-7.542315,111.881405,1,Bawang Merah,High,Interpretasi Visual Satelit,Petak sawah luas dengan warna daun bawang pekat.
+BW013,Rejoso,Sawah Desa Mlorah,-7.551203,111.875612,1,Bawang Merah,Medium,Interpretasi Visual Satelit,"Lahan bawang merah rotasi, pola garis tanah jelas."
+BW014,Rejoso,Timur Kantor Kecamatan,-7.548411,111.888501,1,Bawang Merah,High,Interpretasi Visual Satelit,Bedengan tanah gembur dengan sistem pengairan intensif.
+BW015,Rejoso,Sawah Desa Ngadiboyo,-7.535613,111.890215,1,Bawang Merah,Exclude,Interpretasi Visual Satelit,Kombinasi lahan bawang merah dan area kosong.
+BW016,Rejoso,Pertanian Klagen,-7.538122,111.88341,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Tekstur vegetasi rendah dan rapat (bukan padi).
+BW017,Rejoso,Blok Barat Rejoso,-7.546205,111.879125,1,Bawang Merah,High,Interpretasi Visual Satelit,"Hamparan bawang merah menjelang panen, hijau kekuningan."
+BW018,Rejoso,Sawah Perbatasan Bagor,-7.55541,111.872502,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Lahan dengan pantulan cahaya tinggi dari tanah bedengan.
+BW019,Rejoso,Area Utara Jalan Tol,-7.525105,111.886214,1,Bawang Merah,High,Interpretasi Visual Satelit,Petak-petak bawang merah komersial skala besar.
+BW020,Rejoso,Sawah Dekat Sungai,-7.54172,111.884315,1,Bawang Merah,High,Interpretasi Visual Satelit,Bedengan melengkung mengikuti kontur aliran irigasi.
+BW021,Bagor,Persawahan Desa Bagor Kulon,-7.575102,111.85521,1,Bawang Merah,High,Interpretasi Visual Satelit,Pola bedengan searah dengan jalan desa.
+BW022,Bagor,Sawah Desa Guyangan,-7.572315,111.861405,1,Bawang Merah,High,Interpretasi Visual Satelit,Lahan sentra bawang merah dengan tekstur garis tajam.
+BW023,Bagor,Area Pertanian Banaran,-7.581203,111.851612,1,Bawang Merah,High,Interpretasi Visual Satelit,Dominasi warna tanah merah bata dan hijau tunas.
+BW024,Bagor,Sawah Desa Paron,-7.588411,111.858501,1,Bawang Merah,High,Interpretasi Visual Satelit,"Petak sempit memanjang, khas lahan bawang Bagor."
+BW025,Bagor,Blok Timur Bagor,-7.575613,111.868215,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Lahan intensif dengan naungan/jaring di beberapa titik.
+BW026,Bagor,Sawah Desa Ngumpul,-7.568122,111.86341,1,Bawang Merah,High,Interpretasi Visual Satelit,Hamparan bedengan sejajar saluran sekunder.
+BW027,Bagor,Pertanian Kendalrejo,-7.591205,111.859125,1,Bawang Merah,High,Interpretasi Visual Satelit,"Pola tanam rapat, berbeda dari tekstur sawah padi sekitarnya."
+BW028,Bagor,Sawah Barat Timbangan,-7.57641,111.860502,1,Bawang Merah,High,Interpretasi Visual Satelit,Garis parit membelah bedengan secara rapi.
+BW029,Bagor,Area Selatan Jalan Arteri,-7.583105,111.856214,1,Bawang Merah,High,Interpretasi Visual Satelit,Dominasi vegetasi bawang merah musim kemarau.
+BW030,Bagor,Sawah Pinggir Desa,-7.57972,111.853315,1,Bawang Merah,Exclude,Interpretasi Visual Satelit,"Area persiapan tanam, tekstur bedengan tanah liat."
+BW031,Gondang,Sawah Desa Karangsemi,-7.495102,111.95621,1,Bawang Merah,Exclude,Interpretasi Visual Satelit,"Lahan rotasi bawang merah, pola bedengan terlihat samar."
+BW032,Gondang,Persawahan Desa Senggowar,-7.475315,111.962405,1,Bawang Merah,Exclude,Interpretasi Visual Satelit,Petak bawang merah di antara lahan tebu.
+BW033,Gondang,Pertanian Desa Campur,-7.481203,111.952612,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Bedengan tanah berpasir kemerahan.
+BW034,Gondang,Area Selatan Gondang,-7.508411,111.957501,1,Bawang Merah,High,Interpretasi Visual Satelit,Hamparan bawang merah dengan sistem irigasi sumur dalam.
+BW035,Gondang,Sawah Desa Balonggebang,-7.512613,111.954215,1,Bawang Merah,High,Interpretasi Visual Satelit,"Pola tanam linier, tekstur vegetasi lebih rendah dari tebu."
+BW036,Gondang,Persawahan Ngujung,-7.488122,111.94841,1,Bawang Merah,High,Interpretasi Visual Satelit,Area lahan kering yang dimanfaatkan untuk bawang merah.
+BW037,Gondang,Blok Timur Karangsemi,-7.497205,111.960125,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Petak kecil dengan dominasi warna hijau segar.
+BW038,Gondang,Sawah Perbatasan Sukomoro,-7.51541,111.952502,1,Bawang Merah,Exclude,Interpretasi Visual Satelit,"Transisi zona pertanian, bedengan terstruktur rapi."
+BW039,Gondang,Area Pertanian Kedungglugu,-7.465105,111.961214,1,Bawang Merah,Medium,Interpretasi Visual Satelit,Lahan datar dengan sistem pengairan tadah hujan/sumur.
+BW040,Gondang,Sawah Dekat Hutan,-7.45972,111.958315,1,Bawang Merah,High,Interpretasi Visual Satelit,Bawang merah di area lahan terbuka dekat pinggiran desa.

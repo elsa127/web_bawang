@@ -1,0 +1,95 @@
+METHODS DRAFT
+
+Sentinel-2 Level-2A surface reflectance imagery from the
+COPERNICUS/S2_SR_HARMONIZED collection was used for July-August
+2025. Eight predictor variables were retained: B2, B3, B4, B8,
+B11, B12, NDVI, and NDWI.
+
+An XGBoost binary classifier was developed to discriminate
+shallot and non-shallot agricultural land. Because multiple
+pixels could originate from the same reference location,
+model validation was conducted at the independent-site level
+rather than by randomly splitting individual pixels.
+
+A four-fold stratified site-level cross-validation procedure
+was used. All pixels belonging to the same Parent_Site were
+assigned to the same fold to prevent spatial information
+leakage. During model fitting, pixel weights accounted for
+the number of pixels contributed by each site, ground-truth
+confidence, and class imbalance at the site level.
+
+Out-of-fold probabilities were aggregated to independent
+sites using the median probability of pixels within each site.
+Classification performance was evaluated at a probability
+threshold of 0.50. The reported metrics include
+accuracy, balanced accuracy, precision, recall, specificity,
+F1-score, Matthews correlation coefficient (MCC), ROC-AUC,
+and precision-recall AUC. Stratified bootstrap resampling
+(2000 iterations) was used to estimate
+95% confidence intervals while preserving the observed
+number of positive and negative reference sites.
+
+
+RESULTS DRAFT
+
+The quality-controlled dataset used for model evaluation
+contained 40 independent reference sites, including
+32 shallot sites and 8
+non-shallot sites. These sites contributed 72 pixel
+samples to model development.
+
+At the fixed 0.50 probability threshold, site-level
+out-of-fold evaluation produced an accuracy of
+0.475, balanced accuracy of
+0.344, precision of
+0.720, recall of
+0.562, specificity
+of 0.125, and F1-score of
+0.632. The Matthews correlation
+coefficient was -0.258.
+
+Probability-based discrimination was limited, with a ROC-AUC
+of 0.305. The precision-recall
+average precision was 0.749.
+
+The confusion matrix contained 1 true-negative,
+7 false-positive, 14 false-negative, and 18
+true-positive independent sites. The comparatively high
+number of false-positive predictions indicates difficulty
+in separating shallot signatures from spectrally similar
+non-shallot land-cover and crop conditions.
+
+These findings should therefore be interpreted as a
+site-level baseline assessment rather than as evidence for
+operational estimation of shallot-planted area.
+
+
+DISCUSSION NOTES
+
+The site-level evaluation reveals substantial uncertainty
+that would have been obscured by a conventional random
+pixel-level train-test split. In particular, specificity
+was only 0.125, indicating
+that the model frequently assigned high shallot probability
+to non-shallot reference sites.
+
+This behavior is consistent with spectral overlap among
+vegetated agricultural surfaces in a single seasonal
+Sentinel-2 composite. Reflectance and vegetation-index
+values alone may not uniquely represent crop identity when
+different crops occupy similar phenological states.
+
+The results also emphasize the importance of reference-data
+quality. A limited number of independent non-shallot sites
+reduces the diversity of background conditions represented
+during model fitting and increases uncertainty in
+specificity estimates. Consequently, the current
+classification should not be interpreted as an operational
+shallot-area map.
+
+Future improvement should prioritize independently verified
+reference polygons, additional non-shallot agricultural
+sites, and multi-temporal features describing phenological
+trajectories. These improvements are more important than
+extensive hyperparameter optimization of the current
+training set.

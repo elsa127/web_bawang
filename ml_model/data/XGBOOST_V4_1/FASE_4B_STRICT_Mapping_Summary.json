@@ -1,0 +1,46 @@
+{
+    "Phase": "FASE_4B",
+    "Primary_Dataset": "STRICT",
+    "Model": "XGBoost V4.1 STRICT FINAL",
+    "Repeated_CV": {
+        "Balanced_Accuracy_Mean": 0.8177,
+        "Balanced_Accuracy_SD": 0.0317,
+        "Specificity_Mean": 0.8042,
+        "Specificity_SD": 0.0483,
+        "ROC_AUC_Mean": 0.909,
+        "ROC_AUC_SD": 0.021,
+        "MCC_Mean": 0.6348,
+        "MCC_SD": 0.0631
+    },
+    "Features": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ],
+    "Main_Threshold": 0.5,
+    "Sensitivity_Thresholds": [
+        0.4,
+        0.5,
+        0.6
+    ],
+    "Valid_Predicted_Pixels": 3364570,
+    "Probability_Summary": {
+        "Min": 0.06634392589330673,
+        "P25": 0.5357051491737366,
+        "Median": 0.7946522235870361,
+        "P75": 0.9176276922225952,
+        "P90": 0.9504231810569763,
+        "P95": 0.9552480578422546,
+        "Max": 0.9669052362442017
+    },
+    "Model_Path": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/XGBoost_Bawang_Nganjuk_V4_1_STRICT_FINAL.json",
+    "Probability_Raster": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/Probability_Bawang_Nganjuk_4Kec_V4_1_STRICT.tif",
+    "Binary_Raster": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/Binary_Bawang_Nganjuk_4Kec_V4_1_STRICT_T050.tif",
+    "Area_Table": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/Area_Bawang_Per_Kecamatan_V4_1_STRICT.csv",
+    "Important_Limitation": "Mapped areas represent model-estimated candidate shallot areas. Dynamic World negatives are pseudo-reference samples rather than independent field-survey ground truth."
+}

@@ -1,0 +1,10 @@
+Variable,Value
+Pixel samples,72.0
+Independent sites,40.0
+Positive sites,32.0
+Negative sites,8.0
+Positive pixels,32.0
+Negative pixels,40.0
+Spectral features,8.0
+Cross-validation folds,4.0
+Decision threshold,0.5

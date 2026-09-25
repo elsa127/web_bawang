@@ -1,0 +1,22 @@
+Parent_Site,Lokasi,Kecamatan,Label,Kelas_Detail,Confidence,Fold,Probability_Bawang,Prediction_050,Prediction_Final,Classification_Result,Error_Severity
+NB001,Kantor Kecamatan,Sukomoro,0,Permukiman/Bangunan,High,1,0.9569909,1,1,False Positive,0.9569909
+BW029,Area Selatan Jalan Arteri,Bagor,1,Bawang Merah,High,3,0.06208343,0,0,False Negative,0.93791657
+NB006,Jalan Timur,Sukomoro,0,Jalan,High,3,0.93092996,1,1,False Positive,0.93092996
+BW036,Persawahan Ngujung,Gondang,1,Bawang Merah,High,3,0.07982535,0,0,False Negative,0.92017465
+BW037,Blok Timur Karangsemi,Gondang,1,Bawang Merah,Medium,3,0.11002967,0,0,False Negative,0.88997033
+NB008,Hutan Rimba,Gondang,0,Hutan,High,4,0.87672985,1,1,False Positive,0.87672985
+NB005,Jalan Barat,Bagor,0,Jalan,High,2,0.8576261,1,1,False Positive,0.8576261
+NB004,Sawah Padi,Gondang,0,Padi,High,4,0.8498386,1,1,False Positive,0.8498386
+BW023,Area Pertanian Banaran,Bagor,1,Bawang Merah,High,2,0.18323447,0,0,False Negative,0.81676553
+BW040,Sawah Dekat Hutan,Gondang,1,Bawang Merah,High,1,0.234084,0,0,False Negative,0.765916
+NB007,Hutan Jati,Rejoso,0,Hutan Jati,High,2,0.7601071,1,1,False Positive,0.7601071
+BW003,Selatan Stasiun Sukomoro,Sukomoro,1,Bawang Merah,High,4,0.28668025,0,0,False Negative,0.7133197499999999
+BW026,Sawah Desa Ngumpul,Bagor,1,Bawang Merah,High,1,0.31431022,0,0,False Negative,0.68568978
+BW010,Sawah Selatan Rel KA,Sukomoro,1,Bawang Merah,High,2,0.3878627,0,0,False Negative,0.6121373
+NB003,Lahan Tebu,Gondang,0,Tebu,High,1,0.5793261,1,1,False Positive,0.5793261
+BW012,Area Pertanian Banjarejo,Rejoso,1,Bawang Merah,High,2,0.4303873,0,0,False Negative,0.5696127
+BW006,Blok Pertanian Kapas Barat,Sukomoro,1,Bawang Merah,High,4,0.44104338,0,0,False Negative,0.55895662
+BW007,Sawah Desa Bungur,Sukomoro,1,Bawang Merah,High,3,0.4463965,0,0,False Negative,0.5536035
+BW035,Sawah Desa Balonggebang,Gondang,1,Bawang Merah,High,2,0.4597585,0,0,False Negative,0.5402415
+BW002,Persawahan Desa Nglundo,Sukomoro,1,Bawang Merah,High,2,0.4832731,0,0,False Negative,0.5167269
+BW020,Sawah Dekat Sungai,Rejoso,1,Bawang Merah,High,2,0.4888314,0,0,False Negative,0.5111686

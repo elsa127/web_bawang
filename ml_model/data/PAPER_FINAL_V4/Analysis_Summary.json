@@ -1,0 +1,36 @@
+{
+    "analysis_version": "V4_FINAL_ANALYSIS",
+    "threshold": 0.5,
+    "n_sites": 40,
+    "n_positive_sites": 32,
+    "n_negative_sites": 8,
+    "n_pixels": 72,
+    "features": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ],
+    "metrics": {
+        "Accuracy": 0.475,
+        "Balanced Accuracy": 0.34375,
+        "Precision": 0.72,
+        "Recall / Sensitivity": 0.5625,
+        "Specificity": 0.125,
+        "F1-score": 0.631578947368421,
+        "MCC": -0.25819888974716115,
+        "ROC-AUC": 0.3046875,
+        "PR-AUC": 0.7490580962436519,
+        "NPV": 0.06666666666666667
+    },
+    "confusion_matrix": {
+        "TN": 1,
+        "FP": 7,
+        "FN": 14,
+        "TP": 18
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "Phase": "FASE_3D_C",
+    "Features": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ],
+    "Excluded_Positive_Sites": [
+        "BW013",
+        "BW016"
+    ],
+    "Strict": {
+        "Rows": 56,
+        "Sites": 56,
+        "Positive_Sites": 32,
+        "Negative_Sites": 24,
+        "Duplicate_Sites": 0,
+        "Output": "/content/drive/MyDrive/GEE/dataset_ml_nganjuk_v4_1_STRICT.csv"
+    },
+    "Extended": {
+        "Rows": 58,
+        "Sites": 58,
+        "Positive_Sites": 32,
+        "Negative_Sites": 26,
+        "Duplicate_Sites": 0,
+        "Output": "/content/drive/MyDrive/GEE/dataset_ml_nganjuk_v4_1_EXTENDED.csv"
+    }
+}

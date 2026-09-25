@@ -1,0 +1,56 @@
+{
+    "Model_Version": "XGBoost_Bawang_Nganjuk_V4_1",
+    "Selected_Dataset": "EXTENDED",
+    "Threshold": 0.5,
+    "CV": "4-fold StratifiedGroupKFold by Parent_Site",
+    "Features": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ],
+    "Hyperparameters": {
+        "n_estimators": 180,
+        "max_depth": 3,
+        "learning_rate": 0.035,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "min_child_weight": 2,
+        "gamma": 0.1,
+        "reg_alpha": 0.2,
+        "reg_lambda": 2.0,
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "tree_method": "hist",
+        "random_state": 42,
+        "n_jobs": -1
+    },
+    "Confidence_Weights": {
+        "High": 1.0,
+        "Medium": 0.8,
+        "Pseudo_High": 0.9,
+        "Pseudo_Medium": 0.75
+    },
+    "Selected_Metrics": {
+        "Accuracy": 0.7413793103448276,
+        "Balanced_Accuracy": 0.7403846153846154,
+        "Precision": 0.7741935483870968,
+        "Recall": 0.75,
+        "Specificity": 0.7307692307692307,
+        "F1": 0.7619047619047619,
+        "MCC": 0.4793310904525423,
+        "ROC_AUC": 0.8828125,
+        "PR_AUC": 0.9086940920192208,
+        "TN": 19,
+        "FP": 7,
+        "FN": 8,
+        "TP": 24
+    },
+    "Selection_Method": "Primary comparison using Balanced Accuracy, MCC, ROC-AUC, Specificity, and F1. Threshold fixed at 0.50.",
+    "Important_Limitation": "Dynamic World negative samples are high-confidence pseudo-references, not field-survey ground truth.",
+    "Model_Path": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/XGBoost_Bawang_Nganjuk_V4_1_SELECTED.json"
+}

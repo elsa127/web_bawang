@@ -1,0 +1,24 @@
+{
+    "Phase": "FASE_4D",
+    "Model": "XGBoost V4.1 STRICT",
+    "Purpose": "Domain-of-applicability filtering using high-confidence positive reference.",
+    "Positive_High_Count": 26,
+    "DOA_Method": "Robust standardized Euclidean distance using median and MAD.",
+    "DOA_Threshold": 1.8887216627186385,
+    "DOA_Threshold_Definition": "95th percentile of High positive distances",
+    "Valid_Pixels": 3364570,
+    "Supported_Pixels": 3002360,
+    "Domain_Support_Percent": 89.23458272528138,
+    "XGB_Only_T050_Ha": 26854.446175203724,
+    "DOA_Filtered_T050_Ha": 26047.31739161018,
+    "Reduction_Percent_T050": 3.0055685316601743,
+    "Probability_Thresholds": [
+        0.5,
+        0.6,
+        0.7
+    ],
+    "Distance_Raster": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/Spectral_Distance_Positive_DOA_V4_1.tif",
+    "Final_Binary_T050": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/Candidate_Bawang_DOA_T050_V4_1.tif",
+    "Area_Table": "/content/drive/MyDrive/GEE/XGBOOST_V4_1/Area_Candidate_Bawang_DOA_V4_1.csv",
+    "Important_Limitation": "DOA filtering is a conservative post-classification constraint. Mapped areas remain model-estimated candidate shallot areas and should not be interpreted as official harvested area."
+}

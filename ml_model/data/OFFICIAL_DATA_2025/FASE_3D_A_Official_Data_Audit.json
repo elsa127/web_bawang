@@ -1,0 +1,28 @@
+{
+    "phase": "FASE_3D_A",
+    "project": "risetbawangnganjuk-503805",
+    "roi": {
+        "min_lon": 111.80161656122452,
+        "max_lon": 112.01121102588712,
+        "min_lat": -7.656349920989429,
+        "max_lat": -7.3952819905468
+    },
+    "dynamic_world": {
+        "image_count": 24,
+        "available": true
+    },
+    "simotandi": {
+        "feature_count": 0,
+        "available_in_roi": false
+    },
+    "bawang_kementan": {
+        "feature_count": 0,
+        "available_in_roi": false
+    },
+    "satudata_nganjuk": {
+        "downloaded": true,
+        "rows": 3,
+        "columns": 38,
+        "bawang_rows": 1
+    }
+}

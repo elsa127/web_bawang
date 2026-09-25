@@ -1,0 +1,28 @@
+{
+    "Phase": "FASE_4A_2",
+    "Method": "10-repeat 4-fold StratifiedGroupKFold site-level cross-validation",
+    "Seeds": [
+        11,
+        22,
+        33,
+        44,
+        55,
+        66,
+        77,
+        88,
+        99,
+        111
+    ],
+    "Threshold": 0.5,
+    "Recommended_Dataset": "STRICT",
+    "Strict": {
+        "Balanced_Accuracy_Mean": 0.8177083333333333,
+        "Specificity_Mean": 0.8041666666666666,
+        "ROC_AUC_Mean": 0.9090494791666666
+    },
+    "Extended": {
+        "Balanced_Accuracy_Mean": 0.7757211538461538,
+        "Specificity_Mean": 0.7576923076923077,
+        "ROC_AUC_Mean": 0.893389423076923
+    }
+}

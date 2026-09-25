@@ -1,0 +1,55 @@
+{
+    "Phase": "FASE_5_FINAL",
+    "Analysis_Unit": "Kecamatan-Year",
+    "Years": [
+        2023,
+        2024,
+        2025
+    ],
+    "Kecamatan": [
+        "Bagor",
+        "Gondang",
+        "Rejoso",
+        "Sukomoro"
+    ],
+    "Observations": 12,
+    "Target": "BPS shallot productivity (quintal/ha)",
+    "Predictors": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ],
+    "Sentinel_Method": "Annual Sentinel-2 SR Harmonized multitemporal median composite, administrative mean per kecamatan.",
+    "Spatial_CV": {
+        "MAE": 13.44122852228284,
+        "RMSE": 17.035085776566554,
+        "MAPE": 13.88047796591814,
+        "R2": -0.6555499767202817
+    },
+    "Spatial_Baseline": {
+        "MAE": 12.76150744600872,
+        "RMSE": 15.692134824293056,
+        "MAPE": 13.111030970968853,
+        "R2": -0.4048103808963961
+    },
+    "Temporal_CV": {
+        "MAE": 8.82900628310641,
+        "RMSE": 11.629437302660289,
+        "MAPE": 9.269479416262953,
+        "R2": 0.22843761060044854
+    },
+    "Temporal_Baseline": {
+        "MAE": 10.46594631097913,
+        "RMSE": 14.03998907563924,
+        "MAPE": 10.830737910676397,
+        "R2": -0.12457179218923287
+    },
+    "Important_Limitation": "Only 12 district-year observations are available. The regression is therefore an exploratory administrative-scale proof-of-concept and must not be interpreted as validated pixel-level yield prediction.",
+    "Dataset": "/content/drive/MyDrive/GEE/YIELD_PREDICTION/Yield_Dataset_Nganjuk_2023_2025.csv",
+    "Model": "/content/drive/MyDrive/GEE/YIELD_PREDICTION/XGBoost_Yield_Nganjuk_FINAL.json"
+}

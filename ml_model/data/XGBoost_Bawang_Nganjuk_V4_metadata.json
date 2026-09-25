@@ -1,0 +1,28 @@
+{
+    "version": "V4",
+    "n_pixel_samples": 72,
+    "n_independent_sites": 40,
+    "n_positive_sites": 32,
+    "n_negative_sites": 8,
+    "cv_folds": 4,
+    "default_threshold": 0.5,
+    "oof_accuracy": 0.475,
+    "oof_balanced_accuracy": 0.34375,
+    "oof_precision": 0.72,
+    "oof_recall": 0.5625,
+    "oof_specificity": 0.125,
+    "oof_f1": 0.631578947368421,
+    "oof_mcc": -0.25819888974716115,
+    "oof_roc_auc": 0.3046875,
+    "oof_pr_auc": 0.7490580962436519,
+    "features": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ]
+}

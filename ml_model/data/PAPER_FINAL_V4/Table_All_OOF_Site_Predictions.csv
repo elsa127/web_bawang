@@ -1,0 +1,41 @@
+Parent_Site,Lokasi,Kecamatan,Label,Kelas_Detail,Confidence,Fold,Probability_Bawang,Prediction_050,Prediction_Final,Classification_Result,Error_Severity
+BW001,Utara Jalan Raya Sukomoro,Sukomoro,1,Bawang Merah,High,4,0.6488997,1,1,True Positive,0.35110030000000003
+BW002,Persawahan Desa Nglundo,Sukomoro,1,Bawang Merah,High,2,0.4832731,0,0,False Negative,0.5167269
+BW003,Selatan Stasiun Sukomoro,Sukomoro,1,Bawang Merah,High,4,0.28668025,0,0,False Negative,0.7133197499999999
+BW004,Area Timur Pasar Sukomoro,Sukomoro,1,Bawang Merah,High,4,0.6084652,1,1,True Positive,0.39153479999999996
+BW005,Persawahan Desa Kapas,Sukomoro,1,Bawang Merah,High,3,0.9583641,1,1,True Positive,0.04163589999999995
+BW006,Blok Pertanian Kapas Barat,Sukomoro,1,Bawang Merah,High,4,0.44104338,0,0,False Negative,0.55895662
+BW007,Sawah Desa Bungur,Sukomoro,1,Bawang Merah,High,3,0.4463965,0,0,False Negative,0.5536035
+BW008,Perbatasan Nganjuk Kota,Sukomoro,1,Bawang Merah,Medium,2,0.9493004,1,1,True Positive,0.050699599999999956
+BW010,Sawah Selatan Rel KA,Sukomoro,1,Bawang Merah,High,2,0.3878627,0,0,False Negative,0.6121373
+BW011,Persawahan Desa Rejoso,Rejoso,1,Bawang Merah,High,3,0.746853,1,1,True Positive,0.253147
+BW012,Area Pertanian Banjarejo,Rejoso,1,Bawang Merah,High,2,0.4303873,0,0,False Negative,0.5696127
+BW014,Timur Kantor Kecamatan,Rejoso,1,Bawang Merah,High,2,0.5581819,1,1,True Positive,0.4418181
+BW017,Blok Barat Rejoso,Rejoso,1,Bawang Merah,High,1,0.5535352,1,1,True Positive,0.4464648
+BW018,Sawah Perbatasan Bagor,Rejoso,1,Bawang Merah,Medium,1,0.92003876,1,1,True Positive,0.07996124000000004
+BW019,Area Utara Jalan Tol,Rejoso,1,Bawang Merah,High,4,0.6379013,1,1,True Positive,0.3620987
+BW020,Sawah Dekat Sungai,Rejoso,1,Bawang Merah,High,2,0.4888314,0,0,False Negative,0.5111686
+BW021,Persawahan Desa Bagor Kulon,Bagor,1,Bawang Merah,High,3,0.9639145,1,1,True Positive,0.03608549999999999
+BW022,Sawah Desa Guyangan,Bagor,1,Bawang Merah,High,1,0.8614375,1,1,True Positive,0.13856250000000003
+BW023,Area Pertanian Banaran,Bagor,1,Bawang Merah,High,2,0.18323447,0,0,False Negative,0.81676553
+BW024,Sawah Desa Paron,Bagor,1,Bawang Merah,High,1,0.92977226,1,1,True Positive,0.07022773999999998
+BW025,Blok Timur Bagor,Bagor,1,Bawang Merah,Medium,4,0.86159164,1,1,True Positive,0.13840836
+BW026,Sawah Desa Ngumpul,Bagor,1,Bawang Merah,High,1,0.31431022,0,0,False Negative,0.68568978
+BW027,Pertanian Kendalrejo,Bagor,1,Bawang Merah,High,1,0.83379054,1,1,True Positive,0.16620946000000003
+BW028,Sawah Barat Timbangan,Bagor,1,Bawang Merah,High,1,0.69498956,1,1,True Positive,0.30501044
+BW029,Area Selatan Jalan Arteri,Bagor,1,Bawang Merah,High,3,0.06208343,0,0,False Negative,0.93791657
+BW033,Pertanian Desa Campur,Gondang,1,Bawang Merah,Medium,3,0.91874874,1,1,True Positive,0.08125126000000005
+BW034,Area Selatan Gondang,Gondang,1,Bawang Merah,High,4,0.7118199,1,1,True Positive,0.28818010000000005
+BW035,Sawah Desa Balonggebang,Gondang,1,Bawang Merah,High,2,0.4597585,0,0,False Negative,0.5402415
+BW036,Persawahan Ngujung,Gondang,1,Bawang Merah,High,3,0.07982535,0,0,False Negative,0.92017465
+BW037,Blok Timur Karangsemi,Gondang,1,Bawang Merah,Medium,3,0.11002967,0,0,False Negative,0.88997033
+BW039,Area Pertanian Kedungglugu,Gondang,1,Bawang Merah,Medium,4,0.8262596,1,1,True Positive,0.17374040000000002
+BW040,Sawah Dekat Hutan,Gondang,1,Bawang Merah,High,1,0.234084,0,0,False Negative,0.765916
+NB001,Kantor Kecamatan,Sukomoro,0,Permukiman/Bangunan,High,1,0.9569909,1,1,False Positive,0.9569909
+NB002,Gudang Warga,Sukomoro,0,Bangunan,High,3,0.35865813,0,0,True Negative,0.35865813
+NB003,Lahan Tebu,Gondang,0,Tebu,High,1,0.5793261,1,1,False Positive,0.5793261
+NB004,Sawah Padi,Gondang,0,Padi,High,4,0.8498386,1,1,False Positive,0.8498386
+NB005,Jalan Barat,Bagor,0,Jalan,High,2,0.8576261,1,1,False Positive,0.8576261
+NB006,Jalan Timur,Sukomoro,0,Jalan,High,3,0.93092996,1,1,False Positive,0.93092996
+NB007,Hutan Jati,Rejoso,0,Hutan Jati,High,2,0.7601071,1,1,False Positive,0.7601071
+NB008,Hutan Rimba,Gondang,0,Hutan,High,4,0.87672985,1,1,False Positive,0.87672985

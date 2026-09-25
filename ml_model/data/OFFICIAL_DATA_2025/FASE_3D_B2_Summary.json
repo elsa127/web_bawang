@@ -1,0 +1,39 @@
+{
+    "Phase": "FASE_3D_B2",
+    "Method": "Dynamic World temporal mode, mean probability, temporal consistency, spatial thinning",
+    "Dynamic_World_Images": 24,
+    "Study_Area_ha": 39101.10930462973,
+    "Negative_Sites": 27,
+    "Negative_By_Class": {
+        "built": 14,
+        "water": 7,
+        "trees": 6
+    },
+    "Negative_By_Kecamatan": {
+        "Rejoso": 13,
+        "Sukomoro": 7,
+        "Bagor": 6,
+        "Gondang": 1
+    },
+    "Confidence": {
+        "Pseudo_High": 24,
+        "Pseudo_Medium": 2,
+        "Pseudo_Lower": 1
+    },
+    "Mean_Probability": 0.6969916089095853,
+    "Mean_Consistency": 0.9801016714837816,
+    "Mean_Score": 0.8102356339392638,
+    "Duplicate": 0,
+    "Minimum_Distance_m": 269.0743967553875,
+    "Features": [
+        "B2",
+        "B3",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDWI"
+    ],
+    "Output": "/content/drive/MyDrive/GEE/negative_dynamicworld_nganjuk_v4_1.csv"
+}

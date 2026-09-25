@@ -1,0 +1,22 @@
+{
+    "dataset": "GOOGLE/DYNAMICWORLD/V1",
+    "start_date": "2025-07-01",
+    "end_date_exclusive": "2025-09-01",
+    "image_count": 24,
+    "bands": [
+        "water",
+        "trees",
+        "grass",
+        "flooded_vegetation",
+        "crops",
+        "shrub_and_scrub",
+        "built",
+        "bare"
+    ],
+    "roi": {
+        "min_lon": 111.80161656122452,
+        "max_lon": 112.01121102588712,
+        "min_lat": -7.656349920989429,
+        "max_lat": -7.3952819905468
+    }
+}

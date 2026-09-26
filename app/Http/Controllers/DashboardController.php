@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Response as ResponseFacade;
 
 class DashboardController extends Controller
 {
@@ -11,58 +13,68 @@ class DashboardController extends Controller
      * DASHBOARD UTAMA SI BAWANG MERAH
      * ============================================================
      *
-     * Semua data Machine Learning disimpan di:
+     * SEMUA DATA TETAP BERADA DI:
      *
      *     ml_model/data/
      *
-     * File yang digunakan antara lain:
+     * Struktur penting:
      *
-     * - feature_importance.json
-     * - model_metrics.json
-     * - Yield_Dataset_Nganjuk_2023_2025.csv
-     * - OOf_Site_Prediction_Nganjuk_V4.csv
-     * - dataset_ml_nganjuk_v4.csv
-     * - dataset_ml_nganjuk_v4_qc.csv
-     * - dataset_ml_nganjuk_v4_1_STRICT.csv
-     * - dataset_ml_nganjuk_v4_1_EXTENDED.csv
-     * - FeatureStack_Nganjuk_2025.tif
-     * - FeatureStack_Nganjuk_V3_FINAL.tif
-     * - ground_truth_bawang_training_v4.csv
-     * - ground_truth_bukan_bawang_training_v4.csv
-     * - ground_truth_candidate_bawang_v4.csv
-     * - negative_dynamicworld_nganjuk_*.csv
+     * ml_model/
+     * └── data/
+     *     ├── feature_importance.json
+     *     ├── model_metrics.json
+     *     ├── OOf_Site_Prediction_Nganjuk_V4.csv
+     *     ├── dataset_ml_nganjuk_v4.csv
+     *     ├── dataset_ml_nganjuk_v4_qc.csv
+     *     ├── dataset_ml_nganjuk_v4_1_STRICT.csv
+     *     ├── dataset_ml_nganjuk_v4_1_EXTENDED.csv
+     *     ├── FeatureStack_Nganjuk_2025.tif
+     *     ├── FeatureStack_Nganjuk_V3_FINAL.tif
+     *     ├── OFFICIAL_DATA_2025/
+     *     │   └── Batas_4_Kecamatan_Nganjuk.geojson
+     *     ├── YIELD_PREDICTION/
+     *     │   ├── Yield_Dataset_Nganjuk_2023_2025.csv
+     *     │   └── ...
+     *     └── PAPER_FINAL_V4/
+     *         └── XGBOOST_V4_1/
+     *             ├── FASE_4B_STRICT_Mapping_Summary.json
+     *             ├── Probability_Bawang_Nganjuk_4Kec_V4_1_STRICT.tif
+     *             ├── Binary_Bawang_Nganjuk_4Kec_V4_1_STRICT_T050.tif
+     *             ├── Area_Bawang_Per_Kecamatan_V4_1_STRICT.csv
+     *             ├── Candidate_Bawang_DOA_T050_V4_1_*.tif
+     *             └── ...
      *
-     * ============================================================
+     * CATATAN:
+     * - TIF TIDAK dipindahkan ke public/data.
+     * - TIF tetap berada di ml_model/data.
+     * - TIF disajikan ke browser melalui route whitelist di bawah.
+     * - JSON mapping dibaca langsung dari ml_model/data.
+     * - GeoJSON juga dibaca langsung dari ml_model/data.
      */
     public function index(): View
     {
         /*
         |--------------------------------------------------------------------------
-        | 1. LOKASI UTAMA DATASET MACHINE LEARNING
+        | 1. LOKASI UTAMA DATASET
         |--------------------------------------------------------------------------
-        |
-        | Semua file ML berada di:
-        |
-        |     project-laravel/ml_model/data/
-        |
-        | Karena folder ml_model berada di root project Laravel,
-        | kita menggunakan base_path().
-        |
         */
         $mlPath = base_path('ml_model/data');
 
         /*
         |--------------------------------------------------------------------------
-        | 2. MEMBACA FEATURE IMPORTANCE
+        | 2. PATH DATASET UTAMA
         |--------------------------------------------------------------------------
-        |
-        | File:
-        |
-        |     ml_model/data/feature_importance.json
-        |
-        | File ini berisi tingkat kepentingan fitur yang digunakan
-        | oleh model XGBoost.
-        |
+        */
+        $mappingPath = $mlPath
+            .'/PAPER_FINAL_V4/XGBOOST_V4_1/FASE_4B_STRICT_Mapping_Summary.json';
+
+        $mappingDir = $mlPath
+            .'/PAPER_FINAL_V4/XGBOOST_V4_1';
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. FEATURE IMPORTANCE
+        |--------------------------------------------------------------------------
         */
         $featureImportanceRaw = $this->readJsonFile(
             $mlPath.'/feature_importance.json'
@@ -70,21 +82,8 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 3. MEMBACA METRIK MODEL
+        | 4. MODEL METRICS
         |--------------------------------------------------------------------------
-        |
-        | File:
-        |
-        |     ml_model/data/model_metrics.json
-        |
-        | Digunakan untuk mengambil:
-        |
-        | - MAPE
-        | - MAE
-        | - RMSE
-        | - R2
-        | - Accuracy Approximation
-        |
         */
         $modelMetricsRaw = $this->readJsonFile(
             $mlPath.'/model_metrics.json'
@@ -92,88 +91,56 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 4. TRANSFORMASI FEATURE IMPORTANCE
+        | 5. FEATURE IMPORTANCE -> FORMAT BLADE
         |--------------------------------------------------------------------------
-        |
-        | Data JSON dari Colab diubah menjadi format yang lebih mudah
-        | digunakan oleh Blade.
-        |
         */
         $featureImportance = [];
 
         foreach ($featureImportanceRaw as $item) {
 
-            /*
-             * Pastikan item memiliki struktur yang benar.
-             */
             if (! is_array($item)) {
                 continue;
             }
 
-            $feature = $item['feature'] ?? '';
-            $description = $item['description'] ?? '';
+            $feature = (string) ($item['feature'] ?? '');
+            $description = (string) ($item['description'] ?? '');
+
             $importance = isset($item['importance'])
-                ? (float) $item['importance']
-                : 0;
+                ? $this->toNullableFloat($item['importance'])
+                : null;
 
             $featureImportance[] = [
                 'feature' => $feature,
-
-                /*
-                 * Mengubah nama B2, B3, B4, B8, B11, B12
-                 * menjadi label yang lebih mudah dipahami.
-                 */
                 'name' => $this->bandLabel($feature),
-
                 'role' => $description,
-
-                /*
-                 * Importance dari model biasanya berupa 0.x.
-                 * Diubah menjadi persentase.
-                 */
-                'weight' => round($importance * 100, 1),
+                'weight' => $importance !== null
+                    ? round($importance * 100, 1)
+                    : null,
             ];
         }
 
         /*
         |--------------------------------------------------------------------------
-        | 5. MENGAMBIL METRIK TEMPORAL CROSS VALIDATION
+        | 6. TEMPORAL CROSS VALIDATION
         |--------------------------------------------------------------------------
-        |
-        | Jika file model_metrics.json belum tersedia atau strukturnya
-        | berbeda, kita menggunakan array kosong agar dashboard tidak
-        | langsung mengalami error.
-        |
         */
         $tc = $modelMetricsRaw['temporal_cv'] ?? [];
-
         $tc_ton = $modelMetricsRaw['temporal_cv_ton_ha'] ?? [];
 
         /*
         |--------------------------------------------------------------------------
-        | 6. MEMBACA DATASET SENTINEL-2 + BPS
+        | 7. DATA YIELD SENTINEL-2 + BPS
         |--------------------------------------------------------------------------
-        |
-        | File:
-        |
-        |     Yield_Dataset_Nganjuk_2023_2025.csv
-        |
-        | Dataset ini digunakan untuk menampilkan data historis
-        | produktivitas dan indikator Sentinel-2.
-        |
         */
-        $yieldCsvPath = $mlPath.'/YIELD_PREDICTION/Yield_Dataset_Nganjuk_2023_2025.csv';
+        $yieldCsvPath = $mlPath
+            .'/YIELD_PREDICTION/Yield_Dataset_Nganjuk_2023_2025.csv';
 
         $csvData = $this->parseCsv($yieldCsvPath);
 
         /*
         |--------------------------------------------------------------------------
-        | 7. MENGAMBIL DATA TERBARU TAHUN 2025
+        | 8. DATA TERBARU 2025
         |--------------------------------------------------------------------------
-        |
-        | Data tahun 2025 digunakan sebagai kondisi terbaru
-        | masing-masing kecamatan.
-        |
         */
         $latest = [];
 
@@ -181,8 +148,8 @@ class DashboardController extends Controller
 
             $year = (int) ($row['Year'] ?? 0);
 
-            $district = strtolower(
-                trim((string) ($row['Kecamatan'] ?? ''))
+            $district = $this->normalizeDistrict(
+                $row['Kecamatan'] ?? ''
             );
 
             if ($year === 2025 && $district !== '') {
@@ -192,36 +159,21 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 8. MEMBACA HASIL PREDIKSI XGBOOST
+        | 9. PREDIKSI XGBOOST
         |--------------------------------------------------------------------------
-        |
-        | File:
-        |
-        |     OOf_Site_Prediction_Nganjuk_V4.csv
-        |
-        | File ini digunakan jika memiliki kolom:
-        |
-        | - Kecamatan / District / Site
-        | - Tahun / Year
-        | - Predicted / Prediction / y_pred
-        |
-        | Tujuannya supaya prediksi Bagor, Gondang, dan Rejoso
-        | tidak menggunakan prediksi Sukomoro secara sembarangan.
-        |
         */
         $xgboostPredictions = $this->loadXgboostPredictions($mlPath);
 
         /*
         |--------------------------------------------------------------------------
-        | 9. PREDIKSI SUKOMORO
+        | 10. FALLBACK SUKOMORO
         |--------------------------------------------------------------------------
         |
-        | Nilai berikut merupakan nilai prediksi yang sudah digunakan
-        | pada dashboard sebelumnya dari hasil Leave-One-Year-Out CV.
+        | Dipertahankan dari controller lama agar bagian dashboard
+        | produktivitas tidak hilang.
         |
-        | Jika data OOF memiliki nilai yang sesuai, nilai tersebut
-        | akan digunakan terlebih dahulu.
-        |
+        | Nilai OOF tetap diprioritaskan apabila tersedia.
+        |--------------------------------------------------------------------------
         */
         $xgboostPredSukomoro = [
             2023 => 10.65,
@@ -229,10 +181,6 @@ class DashboardController extends Controller
             2025 => 10.97,
         ];
 
-        /*
-         * Jika OOF Prediction memiliki prediksi Sukomoro,
-         * gunakan nilai tersebut.
-         */
         foreach ([2023, 2024, 2025] as $year) {
 
             if (
@@ -246,15 +194,15 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 10. PERBANDINGAN AKTUAL VS PREDIKSI SUKOMORO
+        | 11. HISTORY SUKOMORO
         |--------------------------------------------------------------------------
-        |
-        | Data ini digunakan pada grafik/tabel produktivitas.
-        |
         */
         $sukomoroHistory = array_filter(
             $csvData,
-            fn ($r) => strtolower(trim((string) ($r['Kecamatan'] ?? ''))) === 'sukomoro'
+            fn ($r) =>
+                $this->normalizeDistrict(
+                    $r['Kecamatan'] ?? ''
+                ) === 'sukomoro'
         );
 
         $comparisons = [];
@@ -263,73 +211,56 @@ class DashboardController extends Controller
 
             $year = (int) ($row['Year'] ?? 0);
 
-            $actualTon = isset($row['Produktivitas_ton_ha'])
-                ? (float) $row['Produktivitas_ton_ha']
-                : 0;
+            $actualTon = $this->toNullableFloat(
+                $row['Produktivitas_ton_ha'] ?? null
+            );
 
             $predTon = $xgboostPredSukomoro[$year] ?? null;
 
             $comparisons[] = [
                 'season' => "Panen {$year} (BPS Sukomoro)",
-
-                'actual' => number_format($actualTon, 2).' T',
-
+                'actual' => $actualTon !== null
+                    ? number_format($actualTon, 2).' T'
+                    : '—',
                 'predicted' => $predTon !== null
-                        ? number_format($predTon, 2).' T'
-                        : '—',
-
-                'actual_pct' => (int) min(
-                    95,
-                    max(0, $actualTon * 8)
-                ),
-
+                    ? number_format($predTon, 2).' T'
+                    : '—',
+                'actual_pct' => $actualTon !== null
+                    ? (int) min(95, max(0, $actualTon * 8))
+                    : 0,
                 'pred_pct' => $predTon !== null
-                        ? (int) min(95, max(0, $predTon * 8))
-                        : 0,
-
+                    ? (int) min(95, max(0, $predTon * 8))
+                    : 0,
                 'is_current' => false,
             ];
         }
 
         /*
         |--------------------------------------------------------------------------
-        | 11. DATA PROYEKSI MUSIM TANAM SEKARANG
+        | 12. PROYEKSI 2026
         |--------------------------------------------------------------------------
         |
-        | Tahun 2026 ditampilkan sebagai proyeksi.
-        |
+        | Tetap dipertahankan supaya tidak mengurangi tampilan lama.
+        |--------------------------------------------------------------------------
         */
         $comparisons[] = [
             'season' => 'Panen Tanam Sekarang (2026)',
-
             'actual' => 'Target: 11.50 T',
-
             'predicted' => 'Prediksi: '
                 .number_format(
                     $xgboostPredSukomoro[2025],
                     2
                 )
                 .' Ton/Ha',
-
             'actual_pct' => 90,
-
             'pred_pct' => 86,
-
             'is_current' => true,
         ];
 
         /*
         |--------------------------------------------------------------------------
-        | 12. EMPAT KECAMATAN PENELITIAN
+        | 13. EMPAT KECAMATAN
         |--------------------------------------------------------------------------
-        |
-        | Wilayah penelitian:
-        |
-        | - Sukomoro
-        | - Bagor
-        | - Gondang
-        | - Rejoso
-        |
         */
         $districts = [
             'Sukomoro',
@@ -340,12 +271,13 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 13. KONFIGURASI PARSEL / KECAMATAN
+        | 14. KONFIGURASI PARSEL
         |--------------------------------------------------------------------------
         |
-        | Data ini digunakan untuk informasi detail ketika pengguna
-        | memilih kecamatan pada peta.
-        |
+        | Struktur tampilan lama dipertahankan.
+        | Data luas/produksi akan dioverride jika dataset area resmi
+        | menyediakan data yang sesuai.
+        |--------------------------------------------------------------------------
         */
         $parcelsConfig = [
 
@@ -396,35 +328,60 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 14. MEMBENTUK DATA PARSEL
+        | 15. DATA AREA HASIL MODEL
         |--------------------------------------------------------------------------
         |
-        | Setiap kecamatan digabungkan dengan data Sentinel-2 tahun 2025.
-        |
+        | Tidak lagi menulis angka luas peta secara manual.
+        | Controller mencari CSV area dari output FASE_4B.
+        |--------------------------------------------------------------------------
+        */
+        $areaData = $this->loadAreaData($mappingDir);
+
+        foreach ($areaData['districts'] as $districtId => $areaRow) {
+
+            if (! isset($parcelsConfig[$districtId])) {
+                continue;
+            }
+
+            if (
+                isset($areaRow['area_ha'])
+                && $areaRow['area_ha'] !== null
+            ) {
+                $parcelsConfig[$districtId]['area'] =
+                    number_format(
+                        $areaRow['area_ha'],
+                        2
+                    ).' Ha';
+            }
+
+            if (
+                isset($areaRow['production'])
+                && $areaRow['production'] !== null
+            ) {
+                $parcelsConfig[$districtId]['production'] =
+                    $this->formatNumberSmart(
+                        $areaRow['production']
+                    );
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 16. DATA PARSEL + SENTINEL-2
+        |--------------------------------------------------------------------------
         */
         $parcels = [];
 
         foreach ($parcelsConfig as $id => $cfg) {
 
-            /*
-             * Ambil data terbaru kecamatan.
-             */
             $row = $latest[$id] ?? null;
 
-            /*
-             * NDWI digunakan sebagai indikator kelembapan.
-             */
             $ndwi = $row !== null
-                ? $this->toNullableFloat($row['NDWI'] ?? null)
+                ? $this->toNullableFloat(
+                    $row['NDWI'] ?? null
+                )
                 : null;
 
-            /*
-             * Konversi sederhana NDWI menjadi persentase tampilan.
-             *
-             * Catatan:
-             * Ini merupakan nilai visualisasi dashboard,
-             * bukan pengukuran kadar air tanah secara langsung.
-             */
             $moisturePct = null;
 
             if ($ndwi !== null) {
@@ -432,20 +389,13 @@ class DashboardController extends Controller
                     40,
                     min(
                         90,
-                        (int) round(68 + ($ndwi + 0.47) * 100)
+                        (int) round(
+                            68 + ($ndwi + 0.47) * 100
+                        )
                     )
                 );
             }
 
-            /*
-             * Prediksi produktivitas khusus kecamatan.
-             *
-             * Sukomoro mempunyai fallback dari data prediksi yang
-             * sudah tersedia.
-             *
-             * Kecamatan lain tidak akan dipaksa memakai prediksi
-             * Sukomoro.
-             */
             $year = $row !== null
                 ? (int) ($row['Year'] ?? 2025)
                 : 2025;
@@ -458,23 +408,25 @@ class DashboardController extends Controller
                         : null
                 );
 
-            /*
-             * Membentuk data akhir yang dikirim ke Blade.
-             */
             $parcels[] = array_merge(
                 $cfg,
                 [
                     'id' => $id,
 
                     'actual_yield' => $row !== null
-                            && isset($row['Produktivitas_ton_ha'])
-                            ? number_format(
-                                (float) $row['Produktivitas_ton_ha'],
-                                2
-                            ).' Ton/Ha'
-                            : null,
+                        && isset(
+                            $row['Produktivitas_ton_ha']
+                        )
+                        ? number_format(
+                            (float) $row[
+                                'Produktivitas_ton_ha'
+                            ],
+                            2
+                        ).' Ton/Ha'
+                        : null,
 
-                    'predicted_yield' => $districtPrediction !== null
+                    'predicted_yield' =>
+                        $districtPrediction !== null
                             ? number_format(
                                 $districtPrediction,
                                 2
@@ -482,55 +434,153 @@ class DashboardController extends Controller
                             : null,
 
                     'ndvi' => $row !== null
-                            ? $this->toNullableFloat($row['NDVI'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['NDVI'] ?? null
+                        )
+                        : null,
 
                     'ndwi' => $ndwi,
 
                     'b12' => $row !== null
-                            ? $this->toNullableFloat($row['B12'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['B12'] ?? null
+                        )
+                        : null,
 
                     'b4' => $row !== null
-                            ? $this->toNullableFloat($row['B4'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['B4'] ?? null
+                        )
+                        : null,
 
                     'b11' => $row !== null
-                            ? $this->toNullableFloat($row['B11'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['B11'] ?? null
+                        )
+                        : null,
 
                     'b8' => $row !== null
-                            ? $this->toNullableFloat($row['B8'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['B8'] ?? null
+                        )
+                        : null,
 
                     'b3' => $row !== null
-                            ? $this->toNullableFloat($row['B3'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['B3'] ?? null
+                        )
+                        : null,
 
                     'b2' => $row !== null
-                            ? $this->toNullableFloat($row['B2'] ?? null)
-                            : null,
+                        ? $this->toNullableFloat(
+                            $row['B2'] ?? null
+                        )
+                        : null,
 
                     'moisture' => $moisturePct !== null
-                            ? "{$moisturePct}%"
-                            : null,
+                        ? "{$moisturePct}%"
+                        : null,
+
+                    'probability' =>
+                        $areaData['districts'][$id]['probability']
+                        ?? null,
+
+                    'candidate' =>
+                        $areaData['districts'][$id]['candidate']
+                        ?? null,
+
+                    'candidate_doa' =>
+                        $areaData['districts'][$id]['candidate_doa']
+                        ?? null,
                 ]
             );
         }
 
         /*
         |--------------------------------------------------------------------------
-        | 15. KPI UTAMA
+        | 17. ML RESULTS UNTUK PETA
         |--------------------------------------------------------------------------
         |
-        | KPI dashboard menggunakan Sukomoro sebagai kecamatan
-        | referensi utama.
-        |
+        | Blade lama menggunakan $mlResults.
+        | Variabel ini tetap disediakan.
+        |--------------------------------------------------------------------------
+        */
+        $mlResults = [];
+
+        foreach ($parcels as $parcel) {
+
+            $mlResults[$parcel['id']] = [
+                'name' => 'Kecamatan '
+                    .ucwords(
+                        str_replace(
+                            '-',
+                            ' ',
+                            $parcel['id']
+                        )
+                    ),
+
+                'status' => $parcel['status']
+                    ?? 'Data ML tersedia',
+
+                'status_badge' =>
+                    $parcel['status_code'] === 'warning'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+
+                'area' => $parcel['area'] ?? '-',
+
+                'plots' =>
+                    $parcel['production']
+                    ?? 'Data area tersedia',
+
+                'yield_info' =>
+                    $parcel['predicted_yield']
+                    ?? 'Belum ada prediksi',
+
+                'ndvi' =>
+                    $parcel['ndvi'] !== null
+                        ? number_format(
+                            $parcel['ndvi'],
+                            3
+                        )
+                        : '-',
+
+                'ndvi_sub' => 'Sentinel-2 2025',
+
+                'moisture' =>
+                    $parcel['moisture']
+                    ?? 'Data kelembapan belum tersedia',
+
+                'moisture_sub' => $parcel['ndwi'] !== null
+                    ? 'NDWI '
+                        .number_format(
+                            $parcel['ndwi'],
+                            3
+                        )
+                    : 'Data NDWI belum tersedia',
+
+                'probability' =>
+                    $parcel['probability'],
+
+                'candidate' =>
+                    $parcel['candidate'],
+
+                'candidate_doa' =>
+                    $parcel['candidate_doa'],
+            ];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 18. KPI UTAMA
+        |--------------------------------------------------------------------------
         */
         $sukomoroLatest = $latest['sukomoro'] ?? null;
 
         $ndviLatest = $sukomoroLatest !== null
-            ? $this->toNullableFloat($sukomoroLatest['NDVI'] ?? null)
+            ? $this->toNullableFloat(
+                $sukomoroLatest['NDVI'] ?? null
+            )
             : null;
 
         $kpiSummary = [
@@ -539,18 +589,21 @@ class DashboardController extends Controller
                 'title' => 'Kondisi Lahan',
 
                 'value' => $ndviLatest !== null
-                        ? (
-                            $ndviLatest >= 0.5
-                                ? 'Subur & Sehat'
-                                : 'Perlu Pantauan'
-                        )
-                        : null,
+                    ? (
+                        $ndviLatest >= 0.5
+                            ? 'Subur & Sehat'
+                            : 'Perlu Pantauan'
+                    )
+                    : null,
 
                 'subtitle' => $ndviLatest !== null
-                        ? 'NDVI '
-                        .number_format($ndviLatest, 3)
+                    ? 'NDVI '
+                        .number_format(
+                            $ndviLatest,
+                            3
+                        )
                         .' (Sentinel-2 2025)'
-                        : null,
+                    : null,
 
                 'color' => 'emerald',
 
@@ -563,10 +616,10 @@ class DashboardController extends Controller
                 'value' => number_format(
                     $xgboostPredSukomoro[2025],
                     2
-                )
-                    .' Ton/Ha',
+                ).' Ton/Ha',
 
-                'subtitle' => 'Estimasi XGBoost Temporal CV',
+                'subtitle' =>
+                    'Estimasi XGBoost Temporal CV',
 
                 'color' => 'rose',
 
@@ -578,7 +631,8 @@ class DashboardController extends Controller
 
                 'value' => 'Fase Vegetatif',
 
-                'subtitle' => 'Estimasi Musim Tanam 2026',
+                'subtitle' =>
+                    'Estimasi Musim Tanam 2026',
 
                 'color' => 'green',
 
@@ -590,7 +644,8 @@ class DashboardController extends Controller
 
                 'value' => 'Siram Pagi Hari',
 
-                'subtitle' => 'Kelembapan SWIR-2 Terjaga',
+                'subtitle' =>
+                    'Kelembapan SWIR-2 Terjaga',
 
                 'color' => 'amber',
 
@@ -600,42 +655,56 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 16. DATA KECAMATAN TERPILIH
+        | 19. DATA KECAMATAN TERPILIH
         |--------------------------------------------------------------------------
-        |
-        | Default ketika halaman pertama kali dibuka adalah Sukomoro.
-        |
         */
         $ndwi2025 = $sukomoroLatest !== null
-            ? $this->toNullableFloat($sukomoroLatest['NDWI'] ?? null)
+            ? $this->toNullableFloat(
+                $sukomoroLatest['NDWI'] ?? null
+            )
             : null;
 
         $selectedDistrict = [
 
             'name' => 'Kecamatan Sukomoro',
 
-            'condition_badge' => 'Kondisi Sangat Baik',
+            'condition_badge' =>
+                'Kondisi Sangat Baik',
 
-            'total_area' => '2,523 Hektar',
+            'total_area' =>
+                $mlResults['sukomoro']['area']
+                ?? 'Data belum tersedia',
 
-            'total_plots' => 'Sentra Utama Nganjuk',
+            'total_plots' =>
+                $mlResults['sukomoro']['plots']
+                ?? 'Data belum tersedia',
 
-            'ndvi_average' => $ndviLatest !== null
+            'ndvi_average' =>
+                $ndviLatest !== null
                     ? 'Sehat ('
-                    .number_format($ndviLatest, 3)
-                    .')'
+                        .number_format(
+                            $ndviLatest,
+                            3
+                        )
+                        .')'
                     : null,
 
-            'ndvi_note' => $ndviLatest !== null
+            'ndvi_note' =>
+                $ndviLatest !== null
                     ? 'Sentinel-2 Komposit 2025'
                     : null,
 
-            'moisture_average' => $ndwi2025 !== null
+            'moisture_average' =>
+                $ndwi2025 !== null
                     ? 'NDWI '
-                    .number_format($ndwi2025, 3)
+                        .number_format(
+                            $ndwi2025,
+                            3
+                        )
                     : null,
 
-            'moisture_note' => $ndwi2025 !== null
+            'moisture_note' =>
+                $ndwi2025 !== null
                     ? 'Kelembapan kanopi (SWIR-2/NIR)'
                     : null,
 
@@ -646,15 +715,19 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 17. DATA SENSOR TANAMAN
+        | 20. SENSOR TANAMAN
         |--------------------------------------------------------------------------
         */
         $b8 = $sukomoroLatest !== null
-            ? $this->toNullableFloat($sukomoroLatest['B8'] ?? null)
+            ? $this->toNullableFloat(
+                $sukomoroLatest['B8'] ?? null
+            )
             : null;
 
         $b4 = $sukomoroLatest !== null
-            ? $this->toNullableFloat($sukomoroLatest['B4'] ?? null)
+            ? $this->toNullableFloat(
+                $sukomoroLatest['B4'] ?? null
+            )
             : null;
 
         $ndviPct = $ndviLatest !== null
@@ -662,12 +735,15 @@ class DashboardController extends Controller
             : null;
 
         $b12 = $sukomoroLatest !== null
-            ? $this->toNullableFloat($sukomoroLatest['B12'] ?? null)
+            ? $this->toNullableFloat(
+                $sukomoroLatest['B12'] ?? null
+            )
             : null;
 
         $moisturePctMain = null;
 
         if ($ndwi2025 !== null) {
+
             $moisturePctMain = max(
                 40,
                 min(
@@ -684,28 +760,32 @@ class DashboardController extends Controller
             'ndvi' => [
 
                 'score' => $ndviLatest !== null
-                        ? number_format($ndviLatest, 3)
-                        : null,
+                    ? number_format(
+                        $ndviLatest,
+                        3
+                    )
+                    : null,
 
                 'status' => $ndviLatest !== null
-                        ? (
-                            $ndviLatest >= 0.5
-                                ? 'Sehat'
-                                : 'Perlu Pantau'
-                        )
-                        : null,
+                    ? (
+                        $ndviLatest >= 0.5
+                            ? 'Sehat'
+                            : 'Perlu Pantau'
+                    )
+                    : null,
 
                 'status_type' => 'good',
 
                 'label' => $ndviLatest !== null
-                        ? (
-                            $ndviLatest >= 0.5
-                                ? 'Kondisi Vegetasi Baik'
-                                : 'Vegetasi Kurang Rapat'
-                        )
-                        : null,
+                    ? (
+                        $ndviLatest >= 0.5
+                            ? 'Kondisi Vegetasi Baik'
+                            : 'Vegetasi Kurang Rapat'
+                    )
+                    : null,
 
-                'description' => $b8 !== null && $b4 !== null
+                'description' =>
+                    $b8 !== null && $b4 !== null
                         ? "Indeks klorofil daun: B8 NIR={$b8}, B4 Red={$b4}. Menunjukkan kerapatan vegetasi aktif fase tanam 2025."
                         : null,
 
@@ -730,26 +810,30 @@ class DashboardController extends Controller
             'moisture' => [
 
                 'score' => $moisturePctMain !== null
-                        ? "{$moisturePctMain}%"
-                        : null,
+                    ? "{$moisturePctMain}%"
+                    : null,
 
                 'status' => $moisturePctMain !== null
-                        ? (
-                            $moisturePctMain >= 60
-                                ? 'Optimal'
-                                : 'Kurang'
-                        )
-                        : null,
+                    ? (
+                        $moisturePctMain >= 60
+                            ? 'Optimal'
+                            : 'Kurang'
+                    )
+                    : null,
 
                 'status_type' => 'warning',
 
                 'label' => $b12 !== null
-                        ? 'Kadar Air SWIR-2 (B12: '
-                        .number_format($b12, 4)
+                    ? 'Kadar Air SWIR-2 (B12: '
+                        .number_format(
+                            $b12,
+                            4
+                        )
                         .')'
-                        : null,
+                    : null,
 
-                'description' => $b12 !== null && $ndwi2025 !== null
+                'description' =>
+                    $b12 !== null && $ndwi2025 !== null
                         ? "Band SWIR-2 B12={$b12} dan NDWI={$ndwi2025} menunjukkan kondisi kelembapan tajuk tanaman dari citra Sentinel-2 2025."
                         : null,
 
@@ -759,11 +843,8 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 18. TREN NDVI MINGGUAN
+        | 21. TREN NDVI MINGGUAN
         |--------------------------------------------------------------------------
-        |
-        | Digunakan untuk grafik perkembangan vegetasi.
-        |
         */
         $ndviPeak = $ndviLatest ?? 0.50;
 
@@ -796,7 +877,10 @@ class DashboardController extends Controller
             [
                 'week' => 'Mgg 4',
                 'value' => round($ndviPeak, 2),
-                'height_pct' => (int) round($ndviPeak * 100),
+                'height_pct' =>
+                    (int) round(
+                        $ndviPeak * 100
+                    ),
                 'is_peak' => true,
                 'badge' => 'Optimal',
             ],
@@ -820,11 +904,13 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 19. INSIGHT ANALISIS CITRA
+        | 22. INSIGHT ANALISIS CITRA
         |--------------------------------------------------------------------------
         */
         $b11 = $sukomoroLatest !== null
-            ? $this->toNullableFloat($sukomoroLatest['B11'] ?? null)
+            ? $this->toNullableFloat(
+                $sukomoroLatest['B11'] ?? null
+            )
             : null;
 
         $b11Fmt = $b11 !== null
@@ -844,11 +930,15 @@ class DashboardController extends Controller
             [
                 'number' => '1',
 
-                'title' => 'Hasil Interpretasi Satelit Sentinel-2',
+                'title' =>
+                    'Hasil Interpretasi Satelit Sentinel-2',
 
                 'highlight' => $ndviLatest !== null
-                        ? 'NDVI: '
-                        .number_format($ndviLatest, 3)
+                    ? 'NDVI: '
+                        .number_format(
+                            $ndviLatest,
+                            3
+                        )
                         .' (Vegetasi '
                         .(
                             $ndviLatest >= 0.5
@@ -856,9 +946,10 @@ class DashboardController extends Controller
                                 : 'Sedang'
                         )
                         .')'
-                        : null,
+                    : null,
 
-                'description' => 'Dedaunan bawang merah Sukomoro: '
+                'description' =>
+                    'Dedaunan bawang merah Sukomoro: '
                     .'B4 Red='
                     .($b4 !== null ? $b4 : '—')
                     .', B8 NIR='
@@ -871,11 +962,14 @@ class DashboardController extends Controller
             [
                 'number' => '2',
 
-                'title' => 'Analisis Kelembapan & Risiko Penyakit',
+                'title' =>
+                    'Analisis Kelembapan & Risiko Penyakit',
 
-                'highlight' => "SWIR-1 B11={$b11Fmt} | SWIR-2 B12={$b12Fmt}",
+                'highlight' =>
+                    "SWIR-1 B11={$b11Fmt} | SWIR-2 B12={$b12Fmt}",
 
-                'description' => 'Kombinasi SWIR-1 dan SWIR-2 mengindikasikan kadar air tajuk. '
+                'description' =>
+                    'Kombinasi SWIR-1 dan SWIR-2 mengindikasikan kadar air tajuk. '
                     ."NDWI={$ndwiInsight} menunjukkan kelembapan kanopi dari ekstraksi Sentinel-2 2025.",
 
                 'color' => 'rose',
@@ -884,14 +978,16 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 20. SIKLUS PERTUMBUHAN BAWANG MERAH
+        | 23. SIKLUS PERTUMBUHAN
         |--------------------------------------------------------------------------
         */
         $growthLifecycle = [
 
-            'subtitle' => 'Fase Vegetatif (Estimasi Musim Tanam 2026)',
+            'subtitle' =>
+                'Fase Vegetatif (Estimasi Musim Tanam 2026)',
 
-            'description' => 'Tanaman bawang merah sedang aktif membentuk anakan dan memperkuat daun sebelum memasuki fase pembentukan umbi.',
+            'description' =>
+                'Tanaman bawang merah sedang aktif membentuk anakan dan memperkuat daun sebelum memasuki fase pembentukan umbi.',
 
             'stages' => [
 
@@ -927,7 +1023,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 21. REKOMENDASI PERTANIAN
+        | 24. REKOMENDASI
         |--------------------------------------------------------------------------
         */
         $ndwiLabel = $ndwi2025 !== null
@@ -943,7 +1039,8 @@ class DashboardController extends Controller
             [
                 'title' => 'Penyiraman Rutin',
 
-                'description' => 'Pertahankan kelembapan tanah 60–70%. '
+                'description' =>
+                    'Pertahankan kelembapan tanah 60–70%. '
                     .'Siram pagi hari sebelum jam 08.00 WIB. '
                     ."NDWI Sukomoro 2025: {$ndwiLabel} — dalam kisaran optimal.",
 
@@ -957,7 +1054,8 @@ class DashboardController extends Controller
             [
                 'title' => 'Waspada Daun',
 
-                'description' => 'Periksa bercak ungu (Alternaria porri) secara berkala. '
+                'description' =>
+                    'Periksa bercak ungu (Alternaria porri) secara berkala. '
                     ."NDVI Sukomoro 2025: {$ndviLabel} — vegetasi aktif, risiko penyakit rendah.",
 
                 'icon' => 'shield',
@@ -970,7 +1068,8 @@ class DashboardController extends Controller
             [
                 'title' => 'Drainase Lahan',
 
-                'description' => 'Pastikan saluran drainase tidak mampet menjelang musim hujan agar umbi tidak tergenang. Pantau reflektansi SWIR-2 (B12) secara berkala.',
+                'description' =>
+                    'Pastikan saluran drainase tidak mampet menjelang musim hujan agar umbi tidak tergenang. Pantau reflektansi SWIR-2 (B12) secara berkala.',
 
                 'icon' => 'cloud-sun',
 
@@ -982,19 +1081,16 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 22. PREDIKSI PRODUKTIVITAS XGBOOST
+        | 25. PREDIKSI PRODUKTIVITAS
         |--------------------------------------------------------------------------
         */
-        $projectedYield = $xgboostPredSukomoro[2025];
+        $projectedYield =
+            $xgboostPredSukomoro[2025];
 
         /*
         |--------------------------------------------------------------------------
-        | 23. MEMBACA NILAI METRIK DENGAN AMAN
+        | 26. METRIK MODEL
         |--------------------------------------------------------------------------
-        |
-        | Jika model_metrics.json tersedia, nilainya ditampilkan.
-        | Jika tidak tersedia, dashboard tetap dapat dibuka.
-        |
         */
         $mape = $this->toNullableFloat(
             $tc['MAPE_pct'] ?? null
@@ -1018,95 +1114,128 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 24. TEKS AKURASI MODEL
+        | 27. AKURASI MODEL
         |--------------------------------------------------------------------------
         */
         if (
             $mape !== null
             && $accuracyApprox !== null
         ) {
+
             $accuracyBadge =
                 'MAPE '
-                .number_format($mape, 2)
+                .number_format(
+                    $mape,
+                    2
+                )
                 .'% | Akurasi ~'
-                .number_format($accuracyApprox, 0)
+                .number_format(
+                    $accuracyApprox,
+                    0
+                )
                 .'% (Temporal CV)';
+
         } else {
-            $accuracyBadge = 'Metrik Temporal CV belum tersedia';
+
+            $accuracyBadge =
+                'Metrik Temporal CV belum tersedia';
         }
 
         /*
         |--------------------------------------------------------------------------
-        | 25. DATA PREDIKSI PRODUKTIVITAS
+        | 28. YIELD PREDICTION
         |--------------------------------------------------------------------------
         */
         $yieldPrediction = [
 
-            'status_badge' => 'Status Prediksi: Produktivitas Sangat Baik',
+            'status_badge' =>
+                'Status Prediksi: Produktivitas Sangat Baik',
 
-            'estimate_title' => 'Estimasi Panen Musim Ini (Sukomoro)',
+            'estimate_title' =>
+                'Estimasi Panen Musim Ini (Sukomoro)',
 
-            'estimate_desc' => 'Diproyeksikan dari 2,523 hektar berdasarkan model XGBoost terlatih dengan komposit tahunan Sentinel-2 (Leave-One-Year-Out CV).',
+            'estimate_desc' =>
+                'Diproyeksikan dari data wilayah berdasarkan model XGBoost terlatih dengan komposit tahunan Sentinel-2 (Leave-One-Year-Out CV).',
 
-            'projected_yield' => number_format($projectedYield, 2),
+            'projected_yield' =>
+                number_format(
+                    $projectedYield,
+                    2
+                ),
 
-            'unit' => 'Ton / Hektar',
+            'unit' =>
+                'Ton / Hektar',
 
-            'accuracy_badge' => $accuracyBadge,
+            'accuracy_badge' =>
+                $accuracyBadge,
 
-            'comparisons' => $comparisons,
+            'comparisons' =>
+                $comparisons,
 
             'model_accuracy' => [
 
-                'rate' => $accuracyApprox !== null
+                'rate' =>
+                    $accuracyApprox !== null
                         ? number_format(
                             $accuracyApprox,
                             0
                         ).'%'
                         : '—',
 
-                'mae' => $maeTon !== null
+                'mae' =>
+                    $maeTon !== null
                         ? number_format(
                             $maeTon,
                             2
                         ).' T'
                         : '—',
 
-                'rmse' => $rmseTon !== null
+                'rmse' =>
+                    $rmseTon !== null
                         ? number_format(
                             $rmseTon,
                             2
                         ).' T'
                         : '—',
 
-                'r_score' => $r2 !== null
+                'r_score' =>
+                    $r2 !== null
                         ? number_format(
                             $r2,
                             3
                         )
                         : '—',
 
-                'note' => $mape !== null && $r2 !== null
+                'note' =>
+                    $mape !== null && $r2 !== null
                         ? 'Evaluasi Temporal Cross-Validation (Leave-One-Year-Out) XGBoost, 4 kecamatan Nganjuk 2023-2025. MAPE: '
-                        .number_format($mape, 2)
-                        .'%. R² = '
-                        .number_format($r2, 3)
-                        .' (12 observasi tahunan).'
+                            .number_format(
+                                $mape,
+                                2
+                            )
+                            .'%. R² = '
+                            .number_format(
+                                $r2,
+                                3
+                            )
+                            .' (12 observasi tahunan).'
                         : 'Data evaluasi model belum tersedia.',
             ],
         ];
 
         /*
         |--------------------------------------------------------------------------
-        | 26. PILAR INFORMASI SISTEM
+        | 29. PILAR SISTEM
         |--------------------------------------------------------------------------
         */
         $aboutPillars = [
 
             [
-                'title' => 'Citra Satelit Sentinel-2',
+                'title' =>
+                    'Citra Satelit Sentinel-2',
 
-                'description' => 'Data citra multispektral resolusi 10m (B2, B3, B4, B8, B11, B12) untuk memantau klorofil dan kelembapan lahan secara berkala.',
+                'description' =>
+                    'Data citra multispektral resolusi 10m (B2, B3, B4, B8, B11, B12) untuk memantau klorofil dan kelembapan lahan secara berkala.',
 
                 'icon' => 'satellite',
 
@@ -1114,9 +1243,11 @@ class DashboardController extends Controller
             ],
 
             [
-                'title' => 'Algoritma XGBoost',
+                'title' =>
+                    'Algoritma XGBoost',
 
-                'description' => 'Model machine learning gradient boosting terlatih dengan validasi silang temporal dan spasial untuk estimasi panen presisi.',
+                'description' =>
+                    'Model machine learning gradient boosting terlatih dengan validasi silang temporal dan spasial untuk estimasi panen presisi.',
 
                 'icon' => 'cpu',
 
@@ -1124,9 +1255,11 @@ class DashboardController extends Controller
             ],
 
             [
-                'title' => 'Validasi Data BPS Nganjuk',
+                'title' =>
+                    'Validasi Data BPS Nganjuk',
 
-                'description' => 'Tervalidasi dengan data produktivitas BPS Kabupaten Nganjuk (Sukomoro, Bagor, Gondang, Rejoso) tahun 2023-2025.',
+                'description' =>
+                    'Tervalidasi dengan data produktivitas BPS Kabupaten Nganjuk (Sukomoro, Bagor, Gondang, Rejoso) tahun 2023-2025.',
 
                 'icon' => 'clipboard',
 
@@ -1134,9 +1267,11 @@ class DashboardController extends Controller
             ],
 
             [
-                'title' => 'Panduan Agronomi Nyata',
+                'title' =>
+                    'Panduan Agronomi Nyata',
 
-                'description' => 'Memberikan saran teknis pertanian berbasis data sensor satelit seperti jadwal siram, pupuk susulan, dan pencegahan hama.',
+                'description' =>
+                    'Memberikan saran teknis pertanian berbasis data sensor satelit seperti jadwal siram, pupuk susulan, dan pencegahan hama.',
 
                 'icon' => 'sprout',
 
@@ -1146,417 +1281,471 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 27. DATA UNTUK LAYER PETA
+        | 30. LAYER PETA
         |--------------------------------------------------------------------------
-        |
-        | Bagian ini disiapkan khusus untuk checkbox / combo box
-        | pada peta.
-        |
-        | Layer yang akan ditampilkan:
-        |
-        | 1. Batas Kecamatan
-        | 2. Probability Map
-        | 3. Candidate T = 0.50
-        | 4. Candidate + DOA
-        |
         */
         $mapLayers = [
 
             [
                 'id' => 'boundary',
-
                 'label' => 'Batas Kecamatan',
-
-                'description' => 'Area administrasi penelitian',
-
+                'description' =>
+                    'Area administrasi penelitian',
                 'type' => 'boundary',
-
-                /*
-                 * Batas kecamatan aktif ketika halaman pertama
-                 * kali dibuka.
-                 */
                 'checked' => true,
-
                 'group' => 'Layer Peta',
             ],
 
             [
                 'id' => 'probability',
-
                 'label' => 'Probability Map',
-
-                'description' => 'Probabilitas kandidat bawang',
-
+                'description' =>
+                    'Probabilitas kandidat bawang',
                 'type' => 'probability',
-
                 'checked' => false,
-
                 'group' => 'Layer Peta',
             ],
 
             [
                 'id' => 'candidate',
-
                 'label' => 'Candidate T = 0.50',
-
-                'description' => 'Kandidat setelah threshold',
-
+                'description' =>
+                    'Kandidat setelah threshold',
                 'type' => 'candidate',
-
-                'threshold' => 0.50,
-
                 'checked' => false,
-
                 'group' => 'Layer Peta',
+                'threshold' => 0.50,
             ],
 
             [
                 'id' => 'candidate_doa',
-
                 'label' => 'Candidate + DOA',
-
-                'description' => 'Kandidat setelah pembatasan DOA',
-
+                'description' =>
+                    'Kandidat setelah pembatasan DOA',
                 'type' => 'candidate_doa',
-
                 'checked' => false,
-
                 'group' => 'Layer Peta',
             ],
         ];
 
         /*
         |--------------------------------------------------------------------------
-        | 28. LEGENDA PROBABILITAS MODEL
+        | 31. LEGEND PROBABILITY
         |--------------------------------------------------------------------------
         |
-        | Digunakan oleh checkbox/legenda pada peta.
-        |
+        | Threshold mengikuti file mapping:
+        | <0.35, 0.35-<0.70, >=0.70.
+        |--------------------------------------------------------------------------
         */
         $probabilityLegend = [
 
             [
                 'id' => 'low',
                 'label' => 'Rendah',
-                'description' => 'Probabilitas rendah',
+                'description' => '< 0.35',
+                'min' => 0,
+                'max' => 0.35,
             ],
 
             [
                 'id' => 'medium',
                 'label' => 'Sedang',
-                'description' => 'Probabilitas sedang',
+                'description' => '0.35 – 0.69',
+                'min' => 0.35,
+                'max' => 0.70,
             ],
 
             [
                 'id' => 'high',
                 'label' => 'Tinggi',
-                'description' => 'Probabilitas tinggi',
+                'description' => '≥ 0.70',
+                'min' => 0.70,
+                'max' => 1,
             ],
         ];
 
         /*
         |--------------------------------------------------------------------------
-        | 29. RINGKASAN LUAS AREA HASIL MODEL
+        | 32. GEOJSON BATAS KECAMATAN
         |--------------------------------------------------------------------------
-        |
-        | Nilai ini digunakan untuk kartu ringkasan pada bagian peta.
-        |
-        */
-        $mapSummary = [
-
-            'valid_area' => [
-                'label' => 'Area Valid',
-                'value' => '33,224.52 ha',
-            ],
-
-            'candidate_area' => [
-                'label' => 'Kandidat T = 0.50',
-                'value' => '26,854.45 ha',
-            ],
-
-            'candidate_doa_area' => [
-                'label' => 'Kandidat + DOA',
-                'value' => '26,047.32 ha',
-            ],
-
-            'threshold' => 0.50,
-        ];
-
-        /*
-        |--------------------------------------------------------------------------
-        | 30. MEMBACA BATAS KECAMATAN GEOJSON
-        |--------------------------------------------------------------------------
-        |
-        | Controller mencari file GeoJSON di ml_model/data.
-        |
-        | Jika file belum ada, boundaryGeoJson menjadi array kosong
-        | sehingga dashboard tidak langsung error.
-        |
         */
         $boundaryGeoJson = [];
 
         $boundaryCandidates = [
 
-            $mlPath.'/OFFICIAL_DATA_2025/Batas_4_Kecamatan_Nganjuk.geojson',
+            $mlPath
+                .'/OFFICIAL_DATA_2025/Batas_4_Kecamatan_Nganjuk.geojson',
 
-            $mlPath.'/OFFICIAL_DATA_2025/batas_4_kecamatan_nganjuk.geojson',
+            $mlPath
+                .'/OFFICIAL_DATA_2025/batas_4_kecamatan_nganjuk.geojson',
 
-            $mlPath.'/Batas_4_Kecamatan_Nganjuk.geojson',
+            $mlPath
+                .'/Batas_4_Kecamatan_Nganjuk.geojson',
 
-            $mlPath.'/batas_4_kecamatan_nganjuk.geojson',
+            $mlPath
+                .'/batas_4_kecamatan_nganjuk.geojson',
 
-            $mlPath.'/Batas_Kecamatan_Nganjuk.geojson',
-
-            $mlPath.'/batas_kecamatan_nganjuk.geojson',
+            base_path(
+                'public/geojson/Batas_4_Kecamatan_Nganjuk.geojson'
+            ),
         ];
 
-        $boundaryPath = $this->firstExistingPath(
-            $boundaryCandidates
-        );
+        $boundaryPath =
+            $this->firstExistingPath(
+                $boundaryCandidates
+            );
 
         if ($boundaryPath !== null) {
 
-            $boundaryData = $this->readJsonFile(
-                $boundaryPath
-            );
+            $boundaryData =
+                $this->readJsonFile(
+                    $boundaryPath
+                );
 
-            /*
-             * Pastikan data yang dimasukkan memang merupakan
-             * struktur GeoJSON.
-             */
             if (
                 isset($boundaryData['type'])
                 && is_array($boundaryData)
             ) {
-                $boundaryGeoJson = $boundaryData;
+                $boundaryGeoJson =
+                    $boundaryData;
             }
         }
 
         /*
         |--------------------------------------------------------------------------
-        | 31. STATUS FILE MODEL
+        | 33. RINGKASAN PETA DARI DATASET AKTUAL
         |--------------------------------------------------------------------------
         |
-        | Bagian ini membantu mengecek apakah file penting sudah
-        | berada di folder ml_model/data.
+        | Angka tidak ditulis lagi sebagai:
+        | 33,224.52 / 26,854.45 / 26,047.32
+        | secara manual.
         |
-        | Data ini bisa digunakan untuk debugging pada dashboard.
-        |
+        | Controller membaca:
+        | - FASE_4B_STRICT_Mapping_Summary.json
+        | - Area_Bawang_Per_Kecamatan_V4_1_STRICT.csv
+        | - file area/candidate/DOA jika tersedia.
+        |--------------------------------------------------------------------------
         */
-        $modelFiles = [
+        $mappingSummary =
+            $this->readJsonFile(
+                $mappingPath
+            );
 
-            'feature_importance' => is_file(
-                $mlPath.'/feature_importance.json'
+        $mapSummary = $this->buildMapSummary(
+            $mappingSummary,
+            $areaData
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 34. URL ASSET MAP
+        |--------------------------------------------------------------------------
+        |
+        | TIF tetap berada di ml_model/data.
+        | Browser mengambil TIF melalui:
+        |
+        |     /map-data/probability
+        |
+        | bukan dari public/data.
+        |--------------------------------------------------------------------------
+        */
+        $mapAssets = [
+
+            'probability' => route(
+                'map.asset',
+                ['asset' => 'probability']
             ),
 
-            'model_metrics' => is_file(
-                $mlPath.'/model_metrics.json'
+            'candidate' => route(
+                'map.asset',
+                ['asset' => 'candidate']
             ),
 
-            'yield_dataset' => is_file(
-                $mlPath.'/YIELD_PREDICTION/Yield_Dataset_Nganjuk_2023_2025.csv'
-            ),
-
-            'oof_prediction' => is_file(
-                $mlPath.'/OOf_Site_Prediction_Nganjuk_V4.csv'
-            ),
-
-            'dataset_ml' => is_file(
-                $mlPath.'/dataset_ml_nganjuk_v4.csv'
-            ),
-
-            'dataset_qc' => is_file(
-                $mlPath.'/dataset_ml_nganjuk_v4_qc.csv'
-            ),
-
-            'dataset_strict' => is_file(
-                $mlPath.'/dataset_ml_nganjuk_v4_1_STRICT.csv'
-            ),
-
-            'dataset_extended' => is_file(
-                $mlPath.'/dataset_ml_nganjuk_v4_1_EXTENDED.csv'
-            ),
-
-            'feature_stack_2025' => is_file(
-                $mlPath.'/FeatureStack_Nganjuk_2025.tif'
-            ),
-
-            'feature_stack_final' => is_file(
-                $mlPath.'/FeatureStack_Nganjuk_V3_FINAL.tif'
+            'candidate_doa' => route(
+                'map.asset',
+                ['asset' => 'candidate_doa']
             ),
         ];
 
         /*
         |--------------------------------------------------------------------------
-        | 32. GOOGLE MAPS API KEY
+        | 35. STATUS FILE MODEL
         |--------------------------------------------------------------------------
         */
-        $googleMapsKey = config(
-            'services.google_maps.api_key',
-            ''
-        );
+        $modelFiles = [
+
+            'feature_importance' =>
+                is_file(
+                    $mlPath.'/feature_importance.json'
+                ),
+
+            'model_metrics' =>
+                is_file(
+                    $mlPath.'/model_metrics.json'
+                ),
+
+            'yield_dataset' =>
+                is_file(
+                    $mlPath
+                    .'/YIELD_PREDICTION/Yield_Dataset_Nganjuk_2023_2025.csv'
+                ),
+
+            'oof_prediction' =>
+                is_file(
+                    $mlPath
+                    .'/OOf_Site_Prediction_Nganjuk_V4.csv'
+                ),
+
+            'dataset_ml' =>
+                is_file(
+                    $mlPath
+                    .'/dataset_ml_nganjuk_v4.csv'
+                ),
+
+            'dataset_qc' =>
+                is_file(
+                    $mlPath
+                    .'/dataset_ml_nganjuk_v4_qc.csv'
+                ),
+
+            'dataset_strict' =>
+                is_file(
+                    $mlPath
+                    .'/dataset_ml_nganjuk_v4_1_STRICT.csv'
+                ),
+
+            'dataset_extended' =>
+                is_file(
+                    $mlPath
+                    .'/dataset_ml_nganjuk_v4_1_EXTENDED.csv'
+                ),
+
+            'feature_stack_2025' =>
+                is_file(
+                    $mlPath
+                    .'/FeatureStack_Nganjuk_2025.tif'
+                ),
+
+            'feature_stack_final' =>
+                is_file(
+                    $mlPath
+                    .'/FeatureStack_Nganjuk_V3_FINAL.tif'
+                ),
+
+            'mapping_summary' =>
+                is_file($mappingPath),
+
+            'probability_tif' =>
+                $this->mapAssetPath('probability') !== null,
+
+            'candidate_tif' =>
+                $this->mapAssetPath('candidate') !== null,
+
+            'candidate_doa_tif' =>
+                $this->mapAssetPath('candidate_doa') !== null,
+
+            'area_table' =>
+                $areaData['source'] !== null,
+        ];
 
         /*
         |--------------------------------------------------------------------------
-        | 33. KIRIM SEMUA DATA KE VIEW
+        | 36. GOOGLE MAPS API KEY
         |--------------------------------------------------------------------------
-        |
-        | Semua variabel dikirim ke:
-        |
-        |     resources/views/welcome.blade.php
-        |
+        */
+        $googleMapsKey =
+            config(
+                'services.google_maps.api_key',
+                ''
+            );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 37. KIRIM SEMUA DATA KE VIEW
+        |--------------------------------------------------------------------------
         */
         return view(
             'welcome',
             compact(
 
-                /*
-                 * KPI dan data utama dashboard
-                 */
                 'kpiSummary',
 
-                /*
-                 * Daftar kecamatan
-                 */
                 'districts',
 
-                /*
-                 * Data setiap kecamatan/parsel
-                 */
                 'parcels',
 
-                /*
-                 * Kecamatan yang pertama kali dipilih
-                 */
                 'selectedDistrict',
 
-                /*
-                 * Sensor tanaman
-                 */
                 'cropSensors',
 
-                /*
-                 * Grafik NDVI
-                 */
                 'weeklyTrends',
 
-                /*
-                 * Insight analisis
-                 */
                 'insights',
 
-                /*
-                 * Siklus pertumbuhan
-                 */
                 'growthLifecycle',
 
-                /*
-                 * Rekomendasi
-                 */
                 'recommendations',
 
-                /*
-                 * Prediksi produktivitas
-                 */
                 'yieldPrediction',
 
-                /*
-                 * Feature importance XGBoost
-                 */
                 'featureImportance',
 
-                /*
-                 * Informasi sistem
-                 */
                 'aboutPillars',
 
-                /*
-                 * Google Maps
-                 */
                 'googleMapsKey',
 
-                /*
-                 * ============================
-                 * DATA KHUSUS PETA
-                 * ============================
-                 */
-
-                /*
-                 * Checkbox layer peta
-                 */
                 'mapLayers',
 
-                /*
-                 * Legenda probability
-                 */
                 'probabilityLegend',
 
-                /*
-                 * Ringkasan luas area
-                 */
                 'mapSummary',
 
-                /*
-                 * Batas kecamatan GeoJSON
-                 */
                 'boundaryGeoJson',
 
-                /*
-                 * Status file ML
-                 */
-                'modelFiles'
+                'modelFiles',
+
+                'mlResults',
+
+                'mappingSummary',
+
+                'mapAssets'
             )
         );
     }
 
     /**
      * ============================================================
-     * MEMBACA FILE JSON
+     * STREAM TIF MAP
      * ============================================================
      *
-     * Fungsi ini digunakan supaya controller tidak langsung error
-     * ketika file JSON tidak ditemukan atau JSON rusak.
+     * TIF TETAP DI:
+     *
+     * ml_model/data/PAPER_FINAL_V4/XGBOOST_V4_1/
+     *
+     * Browser tidak perlu mengakses folder ml_model secara langsung.
      */
-    private function readJsonFile(string $path): array
+    public function mapAsset(string $asset): Response
     {
+        $path = $this->mapAssetPath($asset);
+
+        abort_if(
+            $path === null,
+            404,
+            'File raster peta tidak ditemukan.'
+        );
+
+        return ResponseFacade::file(
+            $path,
+            [
+                'Content-Type' => 'image/tiff',
+                'Cache-Control' =>
+                    'public, max-age=3600',
+            ]
+        );
+    }
+
+    /**
+     * ============================================================
+     * MENCARI PATH ASSET MAP
+     * ============================================================
+     */
+    private function mapAssetPath(
+        string $asset
+    ): ?string {
+
+        $dir =
+            base_path(
+                'ml_model/data/PAPER_FINAL_V4/XGBOOST_V4_1'
+            );
+
         /*
-         * Jika file tidak ada, kembalikan array kosong.
+         * Whitelist.
+         * Tidak menerima path bebas dari user/browser.
          */
+        $candidates = [
+
+            'probability' => [
+                $dir
+                .'/Probability_Bawang_Nganjuk_4Kec_V4_1_STRICT.tif',
+            ],
+
+            'candidate' => [
+                $dir
+                .'/Binary_Bawang_Nganjuk_4Kec_V4_1_STRICT_T050.tif',
+            ],
+
+            'candidate_doa' => [
+                $dir
+                .'/Candidate_Bawang_DOA_T050_V4_1.tif',
+
+                $dir
+                .'/Candidate_Bawang_DOA_T050_V4_1_STRICT.tif',
+            ],
+        ];
+
+        if (! isset($candidates[$asset])) {
+            return null;
+        }
+
+        $path =
+            $this->firstExistingPath(
+                $candidates[$asset]
+            );
+
+        /*
+         * Jika Candidate DOA mempunyai nama file sedikit berbeda,
+         * coba cari hanya pada folder XGBOOST_V4_1.
+         */
+        if (
+            $path === null
+            && $asset === 'candidate_doa'
+        ) {
+
+            $globResults = glob(
+                $dir
+                .'/*Candidate*DOA*T050*.tif'
+            );
+
+            if (
+                is_array($globResults)
+                && ! empty($globResults)
+            ) {
+                $path = $globResults[0];
+            }
+        }
+
+        return $path;
+    }
+
+    /**
+     * ============================================================
+     * MEMBACA JSON
+     * ============================================================
+     */
+    private function readJsonFile(
+        string $path
+    ): array {
+
         if (! is_file($path)) {
             return [];
         }
 
-        /*
-         * Membaca isi file.
-         */
-        $content = file_get_contents($path);
+        $content =
+            file_get_contents($path);
 
-        /*
-         * Jika file gagal dibaca, kembalikan array kosong.
-         */
-        if ($content === false) {
+        if (
+            $content === false
+            || trim($content) === ''
+        ) {
             return [];
         }
 
-        /*
-         * Jika file kosong, kembalikan array kosong.
-         */
-        if (trim($content) === '') {
-            return [];
-        }
+        $decoded =
+            json_decode(
+                $content,
+                true
+            );
 
-        /*
-         * Decode JSON menjadi array PHP.
-         */
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        /*
-         * Jika hasil decode bukan array,
-         * kembalikan array kosong.
-         */
         return is_array($decoded)
             ? $decoded
             : [];
@@ -1566,152 +1755,113 @@ class DashboardController extends Controller
      * ============================================================
      * PARSE CSV
      * ============================================================
-     *
-     * Membaca file CSV menjadi:
-     *
-     * [
-     *     [
-     *         'Kecamatan' => 'Sukomoro',
-     *         'Year' => 2025,
-     *         ...
-     *     ]
-     * ]
      */
-    private function parseCsv(string $path): array
-    {
-        /*
-         * Jika file tidak ditemukan,
-         * jangan menyebabkan dashboard crash.
-         */
+    private function parseCsv(
+        string $path
+    ): array {
+
         if (! is_file($path)) {
             return [];
         }
 
-        /*
-         * Membuka file CSV.
-         */
-        $handle = fopen($path, 'r');
+        $handle =
+            fopen($path, 'r');
 
-        /*
-         * Jika gagal dibuka.
-         */
         if ($handle === false) {
             return [];
         }
 
-        /*
-         * Membaca header CSV.
-         */
-        $headers = fgetcsv(
-            $handle,
-            0,
-            ','
-        );
+        $headers =
+            fgetcsv(
+                $handle,
+                0,
+                ','
+            );
 
-        /*
-         * Jika header kosong,
-         * tutup file lalu kembalikan array kosong.
-         */
         if ($headers === false) {
+
             fclose($handle);
 
             return [];
         }
 
-        /*
-         * Membersihkan header.
-         *
-         * Bagian BOM digunakan untuk mengatasi CSV yang
-         * dibuat dari Excel/Windows sehingga karakter pertama
-         * kadang bukan "Kecamatan" murni.
-         */
-        $headers = array_map(
-            function ($header) {
+        $headers =
+            array_map(
+                function ($header) {
 
-                $header = (string) $header;
+                    $header =
+                        (string) $header;
 
-                /*
-                 * Menghapus UTF-8 BOM.
-                 */
-                $header = preg_replace(
-                    '/^\xEF\xBB\xBF/',
-                    '',
-                    $header
-                );
+                    $header =
+                        preg_replace(
+                            '/^\xEF\xBB\xBF/',
+                            '',
+                            $header
+                        );
 
-                return trim((string) $header);
-            },
-            $headers
-        );
+                    return trim(
+                        (string) $header
+                    );
+                },
+                $headers
+            );
 
         $rows = [];
 
-        /*
-         * Membaca baris satu per satu.
-         */
-        while (($data = fgetcsv(
-            $handle,
-            0,
-            ','
-        )) !== false) {
+        while (
+            ($data = fgetcsv(
+                $handle,
+                0,
+                ','
+            )) !== false
+        ) {
 
-            /*
-             * Jika baris kosong, lewati.
-             */
             if (
                 count($data) === 1
-                && trim((string) $data[0]) === ''
+                && trim(
+                    (string) $data[0]
+                ) === ''
             ) {
                 continue;
             }
 
-            /*
-             * Jika jumlah kolom berbeda dengan header,
-             * kita tetap mencoba menyesuaikan.
-             */
-            $data = array_pad(
-                $data,
-                count($headers),
-                null
-            );
+            $data =
+                array_pad(
+                    $data,
+                    count($headers),
+                    null
+                );
 
-            /*
-             * Batasi data agar jumlahnya sama dengan header.
-             */
-            $data = array_slice(
-                $data,
-                0,
-                count($headers)
-            );
+            $data =
+                array_slice(
+                    $data,
+                    0,
+                    count($headers)
+                );
 
-            /*
-             * Gabungkan header dengan data.
-             */
-            $row = array_combine(
-                $headers,
-                $data
-            );
+            $row =
+                array_combine(
+                    $headers,
+                    $data
+                );
 
             if ($row === false) {
                 continue;
             }
 
-            /*
-             * Membersihkan nilai setiap kolom.
-             */
-            foreach ($row as $key => $value) {
+            foreach (
+                $row as $key => $value
+            ) {
 
                 if (is_string($value)) {
-                    $row[$key] = trim($value);
+                    $row[$key] =
+                        trim($value);
                 }
             }
 
             $rows[] = $row;
         }
 
-        /*
-         * Tutup file.
-         */
         fclose($handle);
 
         return $rows;
@@ -1719,107 +1869,546 @@ class DashboardController extends Controller
 
     /**
      * ============================================================
-     * MEMUAT PREDIKSI XGBOOST
+     * LOAD AREA MODEL
      * ============================================================
      *
-     * Fungsi ini mencoba membaca:
+     * Mencari:
      *
-     *     OOf_Site_Prediction_Nganjuk_V4.csv
+     * Area_Bawang_Per_Kecamatan_V4_1_STRICT.csv
      *
-     * tanpa memaksakan nama kolom tertentu.
-     *
-     * Hal ini penting karena hasil CSV dari Colab bisa memiliki
-     * nama kolom yang sedikit berbeda.
+     * dan file area kandidat/DOA jika tersedia.
+     */
+    private function loadAreaData(
+        string $mappingDir
+    ): array {
+
+        $areaCandidates = [
+
+            $mappingDir
+            .'/Area_Bawang_Per_Kecamatan_V4_1_STRICT.csv',
+
+            $mappingDir
+            .'/Area_Bawang_Per_Kecamatan_V4_1.csv',
+        ];
+
+        $areaPath =
+            $this->firstExistingPath(
+                $areaCandidates
+            );
+
+        /*
+         * Jika nama sedikit berbeda, cari berdasarkan pola.
+         */
+        if ($areaPath === null) {
+
+            $matches =
+                glob(
+                    $mappingDir
+                    .'/*Area*Bawang*Per*Kecamatan*.csv'
+                );
+
+            if (
+                is_array($matches)
+                && ! empty($matches)
+            ) {
+                $areaPath = $matches[0];
+            }
+        }
+
+        $rows =
+            $areaPath !== null
+                ? $this->parseCsv($areaPath)
+                : [];
+
+        $result = [
+
+            'source' => $areaPath,
+
+            'districts' => [],
+
+            'valid_area_ha' => null,
+
+            'candidate_area_ha' => null,
+
+            'candidate_doa_area_ha' => null,
+        ];
+
+        /*
+         * Baca area per kecamatan.
+         */
+        foreach ($rows as $row) {
+
+            $district =
+                $this->findColumnValue(
+                    $row,
+                    [
+                        'Kecamatan',
+                        'kecamatan',
+                        'District',
+                        'district',
+                        'Site',
+                        'site',
+                    ]
+                );
+
+            $districtId =
+                $this->normalizeDistrict(
+                    $district
+                );
+
+            if ($districtId === '') {
+                continue;
+            }
+
+            $area =
+                $this->findNumericColumn(
+                    $row,
+                    [
+                        'Area_Ha',
+                        'area_ha',
+                        'AreaHa',
+                        'Area',
+                        'area',
+                        'Luas_Ha',
+                        'luas_ha',
+                        'Luas',
+                        'luas',
+                        'Candidate_Area_Ha',
+                        'candidate_area_ha',
+                    ]
+                );
+
+            $probability =
+                $this->findNumericColumn(
+                    $row,
+                    [
+                        'Probability',
+                        'probability',
+                        'Mean_Probability',
+                        'mean_probability',
+                        'Probability_Mean',
+                        'probability_mean',
+                        'Mean',
+                        'mean',
+                    ]
+                );
+
+            $candidate =
+                $this->findNumericColumn(
+                    $row,
+                    [
+                        'Candidate_Area_Ha',
+                        'candidate_area_ha',
+                        'Candidate_Ha',
+                        'candidate_ha',
+                        'Area_Candidate_Ha',
+                    ]
+                );
+
+            $candidateDoa =
+                $this->findNumericColumn(
+                    $row,
+                    [
+                        'Candidate_DOA_Area_Ha',
+                        'candidate_doa_area_ha',
+                        'Candidate_Doa_Ha',
+                        'candidate_doa_ha',
+                        'DOA_Area_Ha',
+                        'doa_area_ha',
+                    ]
+                );
+
+            $result['districts'][$districtId] = [
+
+                'area_ha' =>
+                    $area,
+
+                'probability' =>
+                    $probability,
+
+                'candidate' =>
+                    $candidate,
+
+                'candidate_doa' =>
+                    $candidateDoa,
+
+                'production' =>
+                    $this->findNumericColumn(
+                        $row,
+                        [
+                            'Production',
+                            'production',
+                            'Produksi',
+                            'produksi',
+                            'Production_Q',
+                            'production_q',
+                        ]
+                    ),
+            ];
+        }
+
+        /*
+         * Coba membaca file area kandidat terpisah.
+         */
+        $candidatePath =
+            $this->findFileByGlob(
+                $mappingDir,
+                [
+                    '*Area*Candidate*Bawang*.csv',
+                    '*Area*Candidate*.csv',
+                ]
+            );
+
+        if ($candidatePath !== null) {
+
+            $candidateRows =
+                $this->parseCsv(
+                    $candidatePath
+                );
+
+            $candidateTotal = 0.0;
+            $hasCandidateTotal = false;
+
+            foreach ($candidateRows as $row) {
+
+                $value =
+                    $this->findNumericColumn(
+                        $row,
+                        [
+                            'Area_Ha',
+                            'area_ha',
+                            'Candidate_Area_Ha',
+                            'candidate_area_ha',
+                            'Area_Candidate_Ha',
+                        ]
+                    );
+
+                if ($value !== null) {
+                    $candidateTotal += $value;
+                    $hasCandidateTotal = true;
+                }
+            }
+
+            if ($hasCandidateTotal) {
+                $result['candidate_area_ha'] =
+                    $candidateTotal;
+            }
+        }
+
+        /*
+         * Coba file Candidate + DOA.
+         */
+        $doaPath =
+            $this->findFileByGlob(
+                $mappingDir,
+                [
+                    '*Area*Candidate*DOA*.csv',
+                    '*Candidate*DOA*.csv',
+                ]
+            );
+
+        if ($doaPath !== null) {
+
+            $doaRows =
+                $this->parseCsv(
+                    $doaPath
+                );
+
+            $doaTotal = 0.0;
+            $hasDoaTotal = false;
+
+            foreach ($doaRows as $row) {
+
+                $value =
+                    $this->findNumericColumn(
+                        $row,
+                        [
+                            'Area_Ha',
+                            'area_ha',
+                            'Candidate_DOA_Area_Ha',
+                            'candidate_doa_area_ha',
+                            'DOA_Area_Ha',
+                            'doa_area_ha',
+                        ]
+                    );
+
+                if ($value !== null) {
+                    $doaTotal += $value;
+                    $hasDoaTotal = true;
+                }
+            }
+
+            if ($hasDoaTotal) {
+                $result['candidate_doa_area_ha'] =
+                    $doaTotal;
+            }
+        }
+
+        /*
+         * Hitung total area dari baris kecamatan.
+         */
+        $validTotal = 0.0;
+        $validHasValue = false;
+
+        $candidateTotalFromDistrict = 0.0;
+        $candidateHasValue = false;
+
+        $doaTotalFromDistrict = 0.0;
+        $doaHasValue = false;
+
+        foreach (
+            $result['districts']
+            as $districtRow
+        ) {
+
+            if (
+                $districtRow['area_ha']
+                !== null
+            ) {
+
+                $validTotal +=
+                    $districtRow['area_ha'];
+
+                $validHasValue = true;
+            }
+
+            if (
+                $districtRow['candidate']
+                !== null
+            ) {
+
+                $candidateTotalFromDistrict +=
+                    $districtRow['candidate'];
+
+                $candidateHasValue = true;
+            }
+
+            if (
+                $districtRow['candidate_doa']
+                !== null
+            ) {
+
+                $doaTotalFromDistrict +=
+                    $districtRow['candidate_doa'];
+
+                $doaHasValue = true;
+            }
+        }
+
+        if ($validHasValue) {
+            $result['valid_area_ha'] =
+                $validTotal;
+        }
+
+        if (
+            $result['candidate_area_ha']
+            === null
+            && $candidateHasValue
+        ) {
+            $result['candidate_area_ha'] =
+                $candidateTotalFromDistrict;
+        }
+
+        if (
+            $result['candidate_doa_area_ha']
+            === null
+            && $doaHasValue
+        ) {
+            $result['candidate_doa_area_ha'] =
+                $doaTotalFromDistrict;
+        }
+
+        return $result;
+    }
+
+    /**
+     * ============================================================
+     * BUILD MAP SUMMARY
+     * ============================================================
+     */
+    private function buildMapSummary(
+        array $mappingSummary,
+        array $areaData
+    ): array {
+
+        $threshold =
+            $this->toNullableFloat(
+                $mappingSummary['Main_Threshold']
+                ?? null
+            );
+
+        if ($threshold === null) {
+            $threshold = 0.50;
+        }
+
+        $valid =
+            $areaData['valid_area_ha']
+            ?? null;
+
+        $candidate =
+            $areaData['candidate_area_ha']
+            ?? null;
+
+        $candidateDoa =
+            $areaData['candidate_doa_area_ha']
+            ?? null;
+
+        return [
+
+            'valid_area' => [
+
+                'label' => 'Area Valid',
+
+                'value' =>
+                    $valid !== null
+                        ? number_format(
+                            $valid,
+                            2
+                        ).' ha'
+                        : 'Data belum tersedia',
+
+                'raw' => $valid,
+            ],
+
+            'candidate_area' => [
+
+                'label' =>
+                    'Kandidat T = '
+                    .number_format(
+                        $threshold,
+                        2
+                    ),
+
+                'value' =>
+                    $candidate !== null
+                        ? number_format(
+                            $candidate,
+                            2
+                        ).' ha'
+                        : 'Data belum tersedia',
+
+                'raw' => $candidate,
+            ],
+
+            'candidate_doa_area' => [
+
+                'label' =>
+                    'Kandidat + DOA',
+
+                'value' =>
+                    $candidateDoa !== null
+                        ? number_format(
+                            $candidateDoa,
+                            2
+                        ).' ha'
+                        : 'Data belum tersedia',
+
+                'raw' => $candidateDoa,
+            ],
+
+            'threshold' => $threshold,
+
+            'valid_pixels' =>
+                $mappingSummary[
+                    'Valid_Predicted_Pixels'
+                ] ?? null,
+
+            'probability_summary' =>
+                $mappingSummary[
+                    'Probability_Summary'
+                ] ?? [],
+
+            'model' =>
+                $mappingSummary[
+                    'Model'
+                ] ?? null,
+
+            'primary_dataset' =>
+                $mappingSummary[
+                    'Primary_Dataset'
+                ] ?? null,
+
+            'important_limitation' =>
+                $mappingSummary[
+                    'Important_Limitation'
+                ] ?? null,
+        ];
+    }
+
+    /**
+     * ============================================================
+     * LOAD PREDIKSI XGBOOST
+     * ============================================================
      */
     private function loadXgboostPredictions(
         string $mlPath
     ): array {
 
-        /*
-         * File utama hasil prediksi OOF.
-         */
-        $predictionPath = $mlPath
+        $predictionPath =
+            $mlPath
             .'/OOf_Site_Prediction_Nganjuk_V4.csv';
 
-        /*
-         * Jika file belum ada,
-         * kembalikan array kosong.
-         */
         if (! is_file($predictionPath)) {
             return [];
         }
 
-        /*
-         * Baca CSV.
-         */
-        $rows = $this->parseCsv(
-            $predictionPath
-        );
+        $rows =
+            $this->parseCsv(
+                $predictionPath
+            );
 
         if (empty($rows)) {
             return [];
         }
 
-        /*
-         * Ambil struktur kolom dari baris pertama.
-         */
-        $firstRow = $rows[0];
+        $firstRow =
+            $rows[0];
 
-        /*
-         * Cari kolom kecamatan/site.
-         */
-        $districtColumn = $this->findColumn(
-            $firstRow,
-            [
-                'Kecamatan',
-                'kecamatan',
-                'District',
-                'district',
-                'Site',
-                'site',
-                'Lokasi',
-                'lokasi',
-            ]
-        );
+        $districtColumn =
+            $this->findColumn(
+                $firstRow,
+                [
+                    'Kecamatan',
+                    'kecamatan',
+                    'District',
+                    'district',
+                    'Site',
+                    'site',
+                    'Lokasi',
+                    'lokasi',
+                ]
+            );
 
-        /*
-         * Cari kolom tahun.
-         */
-        $yearColumn = $this->findColumn(
-            $firstRow,
-            [
-                'Year',
-                'year',
-                'Tahun',
-                'tahun',
-            ]
-        );
+        $yearColumn =
+            $this->findColumn(
+                $firstRow,
+                [
+                    'Year',
+                    'year',
+                    'Tahun',
+                    'tahun',
+                ]
+            );
 
-        /*
-         * Cari kolom prediksi.
-         */
-        $predictionColumn = $this->findColumn(
-            $firstRow,
-            [
-                'Predicted',
-                'predicted',
-                'Prediction',
-                'prediction',
-                'Predicted_ton_ha',
-                'predicted_ton_ha',
-                'Prediksi_ton_ha',
-                'prediksi_ton_ha',
-                'y_pred',
-                'Y_pred',
-                'pred_ton_ha',
-                'pred_yield_ton_ha',
-            ]
-        );
+        $predictionColumn =
+            $this->findColumn(
+                $firstRow,
+                [
+                    'Predicted',
+                    'predicted',
+                    'Prediction',
+                    'prediction',
+                    'Predicted_ton_ha',
+                    'predicted_ton_ha',
+                    'Prediksi_ton_ha',
+                    'prediksi_ton_ha',
+                    'y_pred',
+                    'Y_pred',
+                    'pred_ton_ha',
+                    'pred_yield_ton_ha',
+                ]
+            );
 
-        /*
-         * Jika kolom kecamatan atau prediksi tidak ditemukan,
-         * jangan membuat asumsi terhadap data.
-         */
         if (
             $districtColumn === null
             || $predictionColumn === null
@@ -1829,60 +2418,41 @@ class DashboardController extends Controller
 
         $predictions = [];
 
-        /*
-         * Membaca setiap baris prediksi.
-         */
         foreach ($rows as $row) {
 
-            /*
-             * Ambil nama kecamatan/site.
-             */
-            $district = strtolower(
-                trim(
-                    (string) (
-                        $row[$districtColumn] ?? ''
-                    )
-                )
-            );
+            $district =
+                $this->normalizeDistrict(
+                    $row[$districtColumn]
+                    ?? ''
+                );
 
             if ($district === '') {
                 continue;
             }
 
-            /*
-             * Jika tahun tidak tersedia,
-             * sementara digunakan 2025.
-             */
-            $year = $yearColumn !== null
-                ? (int) (
-                    $row[$yearColumn] ?? 2025
-                )
-                : 2025;
+            $year =
+                $yearColumn !== null
+                    ? (int) (
+                        $row[
+                            $yearColumn
+                        ] ?? 2025
+                    )
+                    : 2025;
 
-            /*
-             * Ambil nilai prediksi.
-             */
-            $prediction = $this->toNullableFloat(
-                $row[$predictionColumn] ?? null
-            );
+            $prediction =
+                $this->toNullableFloat(
+                    $row[
+                        $predictionColumn
+                    ] ?? null
+                );
 
-            /*
-             * Jangan masukkan nilai yang tidak valid.
-             */
             if ($prediction === null) {
                 continue;
             }
 
-            /*
-             * Simpan dengan struktur:
-             *
-             * [
-             *     'sukomoro' => [
-             *         2025 => 10.97
-             *     ]
-             * ]
-             */
-            $predictions[$district][$year] =
+            $predictions[
+                $district
+            ][$year] =
                 $prediction;
         }
 
@@ -1891,35 +2461,32 @@ class DashboardController extends Controller
 
     /**
      * ============================================================
-     * MENCARI NAMA KOLOM CSV
+     * FIND COLUMN
      * ============================================================
-     *
-     * Fungsi ini membuat controller lebih fleksibel terhadap
-     * perbedaan penamaan kolom dari hasil Google Colab.
      */
     private function findColumn(
         array $row,
         array $candidates
     ): ?string {
 
-        /*
-         * Normalisasi semua nama kolom yang tersedia.
-         */
         $available = [];
 
-        foreach (array_keys($row) as $key) {
+        foreach (
+            array_keys($row)
+            as $key
+        ) {
 
-            $normalized = $this->normalizeColumnName(
-                (string) $key
-            );
-
-            $available[$normalized] = $key;
+            $available[
+                $this->normalizeColumnName(
+                    (string) $key
+                )
+            ] = $key;
         }
 
-        /*
-         * Coba satu per satu nama kolom yang mungkin.
-         */
-        foreach ($candidates as $candidate) {
+        foreach (
+            $candidates
+            as $candidate
+        ) {
 
             $normalizedCandidate =
                 $this->normalizeColumnName(
@@ -1928,10 +2495,14 @@ class DashboardController extends Controller
 
             if (
                 isset(
-                    $available[$normalizedCandidate]
+                    $available[
+                        $normalizedCandidate
+                    ]
                 )
             ) {
-                return $available[$normalizedCandidate];
+                return $available[
+                    $normalizedCandidate
+                ];
             }
         }
 
@@ -1940,7 +2511,116 @@ class DashboardController extends Controller
 
     /**
      * ============================================================
-     * NORMALISASI NAMA KOLOM
+     * FIND COLUMN VALUE
+     * ============================================================
+     */
+    private function findColumnValue(
+        array $row,
+        array $candidates
+    ): mixed {
+
+        $column =
+            $this->findColumn(
+                $row,
+                $candidates
+            );
+
+        return $column !== null
+            ? ($row[$column] ?? null)
+            : null;
+    }
+
+    /**
+     * ============================================================
+     * FIND NUMERIC COLUMN
+     * ============================================================
+     */
+    private function findNumericColumn(
+        array $row,
+        array $candidates
+    ): ?float {
+
+        $column =
+            $this->findColumn(
+                $row,
+                $candidates
+            );
+
+        if ($column === null) {
+            return null;
+        }
+
+        return $this->toNullableFloat(
+            $row[$column] ?? null
+        );
+    }
+
+    /**
+     * ============================================================
+     * FIND FILE BY GLOB
+     * ============================================================
+     */
+    private function findFileByGlob(
+        string $directory,
+        array $patterns
+    ): ?string {
+
+        foreach ($patterns as $pattern) {
+
+            $matches =
+                glob(
+                    $directory.'/'.$pattern
+                );
+
+            if (
+                is_array($matches)
+                && ! empty($matches)
+            ) {
+                return $matches[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * ============================================================
+     * NORMALIZE DISTRICT
+     * ============================================================
+     */
+    private function normalizeDistrict(
+        mixed $value
+    ): string {
+
+        if (
+            $value === null
+            || $value === ''
+        ) {
+            return '';
+        }
+
+        $value =
+            strtolower(
+                trim(
+                    (string) $value
+                )
+            );
+
+        $value =
+            preg_replace(
+                '/^(kec\\.?|kecamatan)\\s+/i',
+                '',
+                $value
+            );
+
+        return trim(
+            (string) $value
+        );
+    }
+
+    /**
+     * ============================================================
+     * NORMALIZE COLUMN NAME
      * ============================================================
      */
     private function normalizeColumnName(
@@ -1958,11 +2638,13 @@ class DashboardController extends Controller
 
     /**
      * ============================================================
-     * KONVERSI NILAI KE FLOAT
+     * KONVERSI FLOAT
      * ============================================================
      *
-     * Jika nilai bukan angka,
-     * fungsi mengembalikan null.
+     * Perbaikan:
+     * - "10,97" -> 10.97
+     * - "1,234.56" -> 1234.56
+     * - "1.234,56" -> 1234.56
      */
     private function toNullableFloat(
         mixed $value
@@ -1975,15 +2657,129 @@ class DashboardController extends Controller
             return null;
         }
 
-        /*
-         * Ubah koma desimal menjadi titik.
-         */
-        if (is_string($value)) {
-            $value = str_replace(
-                ',',
-                '.',
-                trim($value)
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+
+        $value =
+            trim(
+                (string) $value
             );
+
+        if ($value === '') {
+            return null;
+        }
+
+        /*
+         * Hapus simbol selain angka, titik, koma, minus.
+         */
+        $value =
+            preg_replace(
+                '/[^0-9,\.\-]/',
+                '',
+                $value
+            );
+
+        if ($value === '') {
+            return null;
+        }
+
+        $hasComma =
+            str_contains(
+                $value,
+                ','
+            );
+
+        $hasDot =
+            str_contains(
+                $value,
+                '.'
+            );
+
+        if (
+            $hasComma
+            && $hasDot
+        ) {
+
+            /*
+             * Format 1.234,56
+             */
+            if (
+                strrpos(
+                    $value,
+                    ','
+                )
+                >
+                strrpos(
+                    $value,
+                    '.'
+                )
+            ) {
+
+                $value =
+                    str_replace(
+                        '.',
+                        '',
+                        $value
+                    );
+
+                $value =
+                    str_replace(
+                        ',',
+                        '.',
+                        $value
+                    );
+
+            /*
+             * Format 1,234.56
+             */
+            } else {
+
+                $value =
+                    str_replace(
+                        ',',
+                        '',
+                        $value
+                    );
+            }
+
+        } elseif ($hasComma) {
+
+            $parts =
+                explode(
+                    ',',
+                    $value
+                );
+
+            /*
+             * 1234,56 -> desimal
+             */
+            if (
+                count($parts) === 2
+                && strlen(
+                    $parts[1]
+                ) <= 4
+            ) {
+
+                $value =
+                    str_replace(
+                        ',',
+                        '.',
+                        $value
+                    );
+
+            /*
+             * 1,234 -> ribuan
+             */
+            } else {
+
+                $value =
+                    str_replace(
+                        ',',
+                        '',
+                        $value
+                    );
+            }
         }
 
         return is_numeric($value)
@@ -1993,7 +2789,44 @@ class DashboardController extends Controller
 
     /**
      * ============================================================
-     * MENCARI FILE PERTAMA YANG TERSEDIA
+     * FORMAT NUMBER
+     * ============================================================
+     */
+    private function formatNumberSmart(
+        mixed $value
+    ): string {
+
+        $number =
+            $this->toNullableFloat(
+                $value
+            );
+
+        if ($number === null) {
+            return 'Data belum tersedia';
+        }
+
+        if (
+            abs(
+                $number
+                - round($number)
+            ) < 0.000001
+        ) {
+
+            return number_format(
+                $number,
+                0
+            );
+        }
+
+        return number_format(
+            $number,
+            2
+        );
+    }
+
+    /**
+     * ============================================================
+     * FIRST EXISTING PATH
      * ============================================================
      */
     private function firstExistingPath(
@@ -2012,10 +2845,8 @@ class DashboardController extends Controller
 
     /**
      * ============================================================
-     * LABEL BAND SENTINEL-2
+     * BAND LABEL SENTINEL-2
      * ============================================================
-     *
-     * Mengubah kode band menjadi nama yang lebih mudah dibaca.
      */
     private function bandLabel(
         string $feature
@@ -2023,39 +2854,46 @@ class DashboardController extends Controller
 
         $labels = [
 
-            'B2' => 'B2 - Blue',
+            'B2' =>
+                'B2 - Blue',
 
-            'B3' => 'B3 - Green',
+            'B3' =>
+                'B3 - Green',
 
-            'B4' => 'B4 - Red',
+            'B4' =>
+                'B4 - Red',
 
-            'B8' => 'B8 - NIR',
+            'B8' =>
+                'B8 - NIR',
 
-            'B11' => 'B11 - SWIR-1',
+            'B11' =>
+                'B11 - SWIR-1',
 
-            'B12' => 'B12 - SWIR-2',
+            'B12' =>
+                'B12 - SWIR-2',
 
-            'NDVI' => 'NDVI - Indeks Vegetasi',
+            'NDVI' =>
+                'NDVI - Indeks Vegetasi',
 
-            'NDWI' => 'NDWI - Indeks Kelembapan',
+            'NDWI' =>
+                'NDWI - Indeks Kelembapan',
 
-            'NDBI' => 'NDBI - Indeks Bangunan',
+            'NDBI' =>
+                'NDBI - Indeks Bangunan',
 
-            'BSI' => 'BSI - Bare Soil Index',
+            'BSI' =>
+                'BSI - Bare Soil Index',
         ];
 
         /*
-         * Jika label ditemukan,
-         * gunakan label tersebut.
+         * Tambahan agar "b2", "ndvi", dll juga terbaca.
          */
-        if (isset($labels[$feature])) {
-            return $labels[$feature];
-        }
+        $upper =
+            strtoupper(
+                trim($feature)
+            );
 
-        /*
-         * Jika tidak ditemukan,
-         * tampilkan nama feature asli.
-         */
-        return $feature;
+        return $labels[$upper]
+            ?? $feature;
     }
 }

@@ -38,6 +38,25 @@ class MapOverlayTest extends TestCase
         $this->getJson('/map-overlay/satellite')->assertStatus(503);
     }
 
+    public function test_upload_timestamp_changes_do_not_invalidate_map_content(): void
+    {
+        $path = base_path('ml_model/data/OFFICIAL_DATA_2025/Batas_4_Kecamatan_Nganjuk.geojson');
+        $originalTime = filemtime($path);
+        try {
+            touch($path, $originalTime + 120);
+            clearstatcache(true, $path);
+            $this->getJson('/map-info')->assertOk();
+        } finally {
+            touch($path, $originalTime);
+            clearstatcache(true, $path);
+        }
+    }
+
+    public function test_debug_file_paths_are_not_public(): void
+    {
+        $this->get('/debug-tif/probability')->assertNotFound();
+    }
+
     public function test_unknown_layer_returns_404(): void
     {
         $this->get('/map-overlay/not-a-layer')->assertNotFound();

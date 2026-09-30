@@ -28,6 +28,6 @@
     </details>
 
 
-    {{-- 6. Tentang Sistem SI Bawang Merah (4 Pilar Teknologi: Sentinel-2, XGBoost, Validasi, Agronomi) --}}
+    {{-- 6. Tentang Sistem ShallotWatch (4 Pilar Teknologi: Sentinel-2, XGBoost, Validasi, Agronomi) --}}
     @include('partials.about-system')
 @endsection

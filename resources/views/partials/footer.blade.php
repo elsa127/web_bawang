@@ -12,7 +12,7 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="text-base sm:text-lg font-bold tracking-tight block">SI BAWANG MERAH</span>
+                    <span class="text-base sm:text-lg font-bold tracking-tight block">ShallotWatch</span>
                     <span class="text-xs text-rose-200/80 font-medium">Platform Analisis Lahan Pertanian Bawang Merah Terpadu</span>
                 </div>
             </div>
@@ -29,7 +29,7 @@
         <!-- Bottom Copyright Row -->
         <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-rose-200/70">
             <span>Sistem informasi efisiensi pertanian untuk kesejahteraan kelompok tani setempat.</span>
-            <span>&copy; {{ date('Y') }} SI Bawang Merah. Hak Cipta Dilindungi.</span>
+            <span>&copy; {{ date('Y') }} ShallotWatch. Hak Cipta Dilindungi.</span>
         </div>
 
     </div>

@@ -29,7 +29,7 @@
             <p class="w-full text-sm text-slate-600">Pilih tujuan &quot;Simpan sebagai PDF&quot;, ukuran A4. Matikan header/footer bawaan browser agar alamat halaman tidak ikut tercetak.</p>
         </div>
         <header class="mb-6 border-b pb-5">
-            <p>SI BAWANG MERAH | HASIL PENELITIAN</p>
+            <p>ShallotWatch | HASIL PENELITIAN</p>
             <h1 id="report-title-{{ $districtKey }}" class="text-2xl font-bold">Laporan Data dan Evaluasi Machine Learning</h1>
             <p>Wilayah: <strong>{{ $districtReport['scope'] }}</strong> | Periode dataset: 2023-2025</p>
             <p>Dicetak: {{ now()->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB | {{ count($districtReport['rows']) }} observasi ditampilkan</p>

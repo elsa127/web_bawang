@@ -152,7 +152,7 @@ def generate(root):
         manifest['layers']['satellite'] = save_satellite(satellite_path, output / 'overlay_satellite.png')
     # Manifest diterbitkan terakhir setelah seluruh PNG selesai dibuat.
     manifest['sources'] = {
-        path.relative_to(root).as_posix(): {'mtime': int(path.stat().st_mtime), 'size': path.stat().st_size}
+        path.relative_to(root).as_posix(): {'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'size': path.stat().st_size}
         for path in sources}
     manifest['version'] = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()[:16]
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')

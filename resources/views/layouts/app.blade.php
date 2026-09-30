@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'SI Bawang Merah') }} - Platform Monitoring & Analisis Pertanian</title>
+    <title>ShallotWatch | Peta dan Prediksi Bawang Merah</title>
 
     <!-- Meta Description & SEO -->
-    <meta name="description" content="Platform Pemantauan Kondisi Lahan, Analisis Tanaman, Prediksi Hasil Panen, dan Rekomendasi Pertanian Bawang Merah Terpadu Berbasis Satelit dan AI.">
+    <meta name="description" content="ShallotWatch menyajikan peta kandidat lahan dan hasil prediksi produktivitas bawang merah di empat kecamatan Nganjuk.">
     <meta name="theme-color" content="#7A1B28">
 
     <!-- Google Fonts: Plus Jakarta Sans & Inter -->
@@ -60,6 +60,8 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #FAF6F4;
             color: #1F2937;
+            font-size: 16px;
+            line-height: 1.65;
         }
 
         /* Custom Scrollbar */
@@ -88,6 +90,9 @@
                 color: black !important;
             }
         }
+        section[id], #main-content { scroll-margin-top: 140px; }
+        a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid #9f1239; outline-offset: 3px; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto !important; } }
     </style>
 </head>
 <body class="bg-[#FAF6F4] text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-700 selection:text-white"
@@ -111,7 +116,7 @@
     @include('partials.navbar')
 
     <!-- Main Content Area -->
-    <main class="flex-grow">
+    <main id="main-content" class="flex-grow">
         @yield('content')
     </main>
 

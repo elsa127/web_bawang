@@ -7,14 +7,14 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     /**
-     * Verifikasi halaman utama SI Bawang Merah tampil dengan benar.
+     * Verifikasi halaman utama ShallotWatch tampil dengan benar.
      */
     public function test_the_application_returns_a_successful_response(): void
     {
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('SI BAWANG MERAH');
+        $response->assertSee('ShallotWatch');
         $response->assertSee('Pantau Kondisi Lahan');
         $response->assertSee('Peta Kandidat Bawang Merah');
         $response->assertSee('Sukomoro');

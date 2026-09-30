@@ -1,0 +1,96 @@
+{
+  "schema": 2,
+  "layers": {
+    "probability": {
+      "bounds": [
+        [
+          -7.83664740780522,
+          111.72535834804152
+        ],
+        [
+          -7.393943272059372,
+          112.16911554164653
+        ]
+      ]
+    },
+    "candidate": {
+      "bounds": [
+        [
+          -7.83664740780522,
+          111.72535834804152
+        ],
+        [
+          -7.393943272059372,
+          112.16911554164653
+        ]
+      ]
+    },
+    "candidate_doa": {
+      "bounds": [
+        [
+          -7.83664740780522,
+          111.72535834804152
+        ],
+        [
+          -7.393943272059372,
+          112.16911554164653
+        ]
+      ]
+    }
+  },
+  "coverage": [
+    {
+      "district": "Bagor",
+      "total_pixels": 541174,
+      "valid_pixels": 541086,
+      "missing_pixels": 88,
+      "missing_percent": 0.02
+    },
+    {
+      "district": "Gondang",
+      "total_pixels": 1366105,
+      "valid_pixels": 795877,
+      "missing_pixels": 570228,
+      "missing_percent": 41.74
+    },
+    {
+      "district": "Rejoso",
+      "total_pixels": 1672988,
+      "valid_pixels": 1663870,
+      "missing_pixels": 9118,
+      "missing_percent": 0.55
+    },
+    {
+      "district": "Sukomoro",
+      "total_pixels": 372327,
+      "valid_pixels": 372327,
+      "missing_pixels": 0,
+      "missing_percent": 0.0
+    }
+  ],
+  "landcover_available": false,
+  "satellite_available": false,
+  "sources": {
+    "ml_model/generate_map_overlays.py": {
+      "size": 8967,
+      "sha256": "5ef514ff615d81106168d83275209fcc41e2dbac9df56fc1ea15d6348fa67e2d"
+    },
+    "ml_model/data/OFFICIAL_DATA_2025/Batas_4_Kecamatan_Nganjuk.geojson": {
+      "size": 9547,
+      "sha256": "87b09ecd394555847546e450e59d623efb7f8d310736774c8f31710e34398cda"
+    },
+    "ml_model/data/XGBOOST_V4_1/Probability_Bawang_Nganjuk_4Kec_V4_1_STRICT.tif": {
+      "size": 12069681,
+      "sha256": "68fe54e5fec2d6cfd00444e6d246f6e685d82b6693bb1759dbe71d8d7b5ba08a"
+    },
+    "ml_model/data/XGBOOST_V4_1/Binary_Bawang_Nganjuk_4Kec_V4_1_STRICT_T050.tif": {
+      "size": 330147,
+      "sha256": "726ba0f09b10bf7b746968eee7936fb8ed61c5d727d5e3f713d0471711b3a3e8"
+    },
+    "ml_model/data/XGBOOST_V4_1/Candidate_Bawang_DOA_T050_V4_1.tif": {
+      "size": 339508,
+      "sha256": "1852a59e0aa0786801985a854bebf2f7af1c702dba3503283d0e928be6880ad1"
+    }
+  },
+  "version": "28cd3e81c8b73e7b"
+}

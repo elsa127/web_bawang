@@ -43,6 +43,7 @@
     id="peta"
     class="py-8 sm:py-10"
     x-data="mapNganjuk()"
+    @district-requested.window="updateSelectedData($event.detail)"
     x-init="startMap()"
 >
 
@@ -59,7 +60,7 @@
 
                 <div>
 
-                    <p class="text-sm font-semibold text-brand-600 mb-1">
+                    <p class="text-base font-semibold text-brand-600 mb-1">
                         Analisis Spasial
                     </p>
 
@@ -68,11 +69,11 @@
                         🗺️ Peta Kandidat Bawang Merah
                     </h2>
 
-                    <p class="text-sm text-slate-500 mt-2 max-w-2xl">
+                    <p class="text-base text-slate-500 mt-2 max-w-2xl">
                         Jelajahi hasil model di Bagor, Gondang, Rejoso, dan Sukomoro. Warna peta menunjukkan perkiraan model, bukan kepastian lahan bawang merah.
                     </p>
 
-                    <p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-900">
+                    <p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
                         <strong>Hasil penelitian.</strong> Kandidat belum memastikan keberadaan bawang merah. Permukiman masih dapat masuk pada hasil model awal; DOA bukan penyaring permukiman.
                     </p>
 
@@ -113,7 +114,7 @@
 
                     <div>
 
-                        <p class="text-xs text-slate-400">
+                        <p class="text-sm text-slate-400">
                             Wilayah Terpilih
                         </p>
 
@@ -127,18 +128,18 @@
 
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <a href="#map-filters" class="lg:hidden rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-brand-800">Filter peta</a>
+                        <a href="#map-filters" class="lg:hidden rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-brand-800">Filter peta</a>
                         <div class="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1" role="group" aria-label="Pilih peta dasar">
                             <button type="button" @click="if (mapBaseLayer !== 'satellite') toggleBaseLayer()"
                                     :aria-pressed="mapBaseLayer === 'satellite'"
                                     :class="mapBaseLayer === 'satellite' ? 'bg-white text-brand-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
-                                    class="rounded-lg px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-800">
+                                    class="rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-800">
                                 {{ ($mapManifest['satellite_available'] ?? false) ? 'Sentinel-2' : 'Satelit Esri' }}
                             </button>
                             <button type="button" @click="if (mapBaseLayer !== 'street') toggleBaseLayer()"
                                     :aria-pressed="mapBaseLayer === 'street'"
                                     :class="mapBaseLayer === 'street' ? 'bg-white text-brand-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
-                                    class="rounded-lg px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-800">Peta jalan</button>
+                                    class="rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-800">Peta jalan</button>
                         </div>
                     </div>
 
@@ -178,7 +179,7 @@
                             >
                             </div>
 
-                            <p class="text-sm
+                            <p class="text-base
                                       font-semibold
                                       text-slate-600">
                                 Memuat peta...
@@ -207,7 +208,7 @@
                                 ⚠️
                             </div>
 
-                            <p class="text-sm
+                            <p class="text-base
                                       font-bold
                                       text-slate-700
                                       mb-1">
@@ -215,7 +216,7 @@
                             </p>
 
                             <p
-                                class="text-xs
+                                class="text-sm
                                        text-slate-500"
                                 x-text="mapError"
                             >
@@ -227,7 +228,7 @@
 
 
                 </div>
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 px-4 py-3 text-xs text-slate-600" aria-label="Legenda peta">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 px-4 py-3 text-sm text-slate-600" aria-label="Legenda peta">
                     <span class="font-semibold text-slate-800">Legenda</span>
                     <template x-if="isMapLayerActive('probability')">
                         <span class="flex flex-wrap gap-x-3 gap-y-2">
@@ -251,7 +252,7 @@
                            bg-slate-50"
                 >
 
-                    <p class="text-[11px] text-slate-400">
+                    <p class="text-sm text-slate-400">
 
                         Sumber batas wilayah:
 
@@ -262,7 +263,7 @@
 
                     </p>
 
-                    <p class="text-[11px]
+                    <p class="text-sm
                               text-slate-400
                               mt-0.5">
                         @if($mapManifest['satellite_available'] ?? false)
@@ -287,15 +288,15 @@
                     <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-900">Filter peta</h3>
-                            <p class="mt-1 text-xs text-slate-500">Atur wilayah dan hasil yang ditampilkan.</p>
+                            <p class="mt-1 text-sm text-slate-500">Atur wilayah dan hasil yang ditampilkan.</p>
                         </div>
                         <button type="button" @click="selectRasterLayer('none'); selectAllDistricts()"
-                                class="rounded-lg px-2 py-2 text-xs font-semibold text-brand-800 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-800">Reset</button>
+                                class="rounded-lg px-2 py-2 text-sm font-semibold text-brand-800 hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-800">Reset</button>
                     </div>
                     <div class="space-y-5 p-5">
                         <div>
-                            <label for="map-district" class="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Wilayah</label>
-                            <select id="map-district" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-800 focus:border-brand-800 focus:outline-none focus:ring-2 focus:ring-rose-100"
+                            <label for="map-district" class="mb-2 block text-sm font-bold uppercase tracking-wide text-slate-500">Wilayah</label>
+                            <select id="map-district" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base text-slate-800 focus:border-brand-800 focus:outline-none focus:ring-2 focus:ring-rose-100"
                                     :value="selectedDistrict" @change="$event.target.value === 'all' ? selectAllDistricts() : selectDistrict($event.target.value)">
                                 <option value="all">Semua kecamatan</option>
                                 @foreach(['Bagor', 'Gondang', 'Rejoso', 'Sukomoro'] as $districtName)
@@ -304,7 +305,7 @@
                             </select>
                         </div>
                         <fieldset class="space-y-2">
-                            <legend class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Tampilan hasil</legend>
+                            <legend class="mb-2 text-sm font-bold uppercase tracking-wide text-slate-500">Tampilan hasil</legend>
                             @foreach([
                                 ['id' => 'none', 'title' => 'Peta dasar', 'description' => 'Tanpa lapisan hasil model.'],
                                 ['id' => 'probability', 'title' => 'Probabilitas', 'description' => 'Skor model dari rendah hingga tinggi.'],
@@ -320,26 +321,26 @@
                                            :checked="'{{ $option['id'] }}' === 'none' ? !activeMapLayers.some(id => id !== 'boundary') : isMapLayerActive('{{ $option['id'] }}')"
                                            @change="selectRasterLayer('{{ $option['id'] }}')">
                                     <span class="min-w-0">
-                                        <span class="block text-sm font-semibold text-slate-800">{{ $option['title'] }}</span>
-                                        <span class="mt-1 block text-xs leading-relaxed text-slate-500">{{ $option['description'] }}</span>
+                                        <span class="block text-base font-semibold text-slate-800">{{ $option['title'] }}</span>
+                                        <span class="mt-1 block text-sm leading-relaxed text-slate-500">{{ $option['description'] }}</span>
 
                                     </span>
                                 </label>
                             @endforeach
                         </fieldset>
-                        <label class="flex items-center gap-3 border-t border-slate-100 pt-4 text-sm text-slate-700 cursor-pointer">
+                        <label class="flex items-center gap-3 border-t border-slate-100 pt-4 text-base text-slate-700 cursor-pointer">
                             <input type="checkbox" class="h-4 w-4 accent-brand-800" :checked="isMapLayerActive('boundary')" @change="toggleMapLayer('boundary')">
                             Garis batas kecamatan
                         </label>
                         <template x-for="layerId in ['probability','candidate','candidate_doa','candidate_landcover']" :key="layerId">
                             <div aria-live="polite">
-                                <p x-show="isMapLayerActive(layerId) && layers[layerId].status === 'loading'" x-cloak class="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">Memuat lapisan peta...</p>
-                                <p x-show="isMapLayerActive(layerId) && layers[layerId].status === 'error'" x-cloak role="alert" class="rounded-lg bg-rose-50 p-3 text-xs text-rose-800" x-text="layers[layerId].error"></p>
+                                <p x-show="isMapLayerActive(layerId) && layers[layerId].status === 'loading'" x-cloak class="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">Memuat lapisan peta...</p>
+                                <p x-show="isMapLayerActive(layerId) && layers[layerId].status === 'error'" x-cloak role="alert" class="rounded-lg bg-rose-50 p-3 text-sm text-rose-800" x-text="layers[layerId].error"></p>
                             </div>
                         </template>
                         <details class="border-t border-slate-100 pt-4">
-                            <summary class="cursor-pointer text-xs font-semibold text-slate-700">Tentang data dan cakupan wilayah</summary>
-                            <div class="mt-3 space-y-3 text-xs leading-relaxed text-slate-500">
+                            <summary class="cursor-pointer text-sm font-semibold text-slate-700">Tentang data dan cakupan wilayah</summary>
+                            <div class="mt-3 space-y-3 text-sm leading-relaxed text-slate-500">
                                 <p>Warna menunjukkan hasil model, bukan konfirmasi lapangan. Abu-abu berarti data belum tersedia; area tersebut belum dapat dinilai.</p>
                                 @unless($mapManifest['landcover_available'] ?? false)
                                     <p>Penyaring permukiman belum tersedia pada hasil penelitian ini.</p>
@@ -375,7 +376,7 @@
 
                         <div>
 
-                            <p class="text-xs text-slate-400">
+                            <p class="text-sm text-slate-400">
                                 Detail Kecamatan
                             </p>
 
@@ -394,7 +395,7 @@
                         <span
                             class="px-2.5 py-1
                                    rounded-full
-                                   text-[10px]
+                                   text-sm
                                    font-bold
                                    border"
                             :class="selectedData.status_badge"
@@ -418,13 +419,13 @@
                                    p-3"
                         >
 
-                            <p class="text-[10px]
+                            <p class="text-sm
                                       text-slate-400">
                                 Area raster valid
                             </p>
 
                             <p
-                                class="text-sm
+                                class="text-base
                                        font-bold
                                        text-slate-700
                                        mt-1"
@@ -441,13 +442,13 @@
                                    p-3"
                         >
 
-                            <p class="text-[10px]
+                            <p class="text-sm
                                       text-slate-400">
                                 Produksi BPS
                             </p>
 
                             <p
-                                class="text-sm
+                                class="text-base
                                        font-bold
                                        text-slate-700
                                        mt-1"
@@ -464,13 +465,13 @@
                                    p-3"
                         >
 
-                            <p class="text-[10px]
+                            <p class="text-sm
                                       text-slate-400">
                                 Prediksi produktivitas 2025
                             </p>
 
                             <p
-                                class="text-sm
+                                class="text-base
                                        font-bold
                                        text-slate-700
                                        mt-1"
@@ -487,13 +488,13 @@
                                    p-3"
                         >
 
-                            <p class="text-[10px]
+                            <p class="text-sm
                                       text-slate-400">
                                 NDVI
                             </p>
 
                             <p
-                                class="text-sm
+                                class="text-base
                                        font-bold
                                        text-slate-700
                                        mt-1"
@@ -518,13 +519,13 @@
                                    p-3"
                         >
 
-                            <p class="text-[10px]
+                            <p class="text-sm
                                       text-slate-400">
                                 NDWI (indeks satelit)
                             </p>
 
                             <p
-                                class="text-sm
+                                class="text-base
                                        font-bold
                                        text-slate-700
                                        mt-1"
@@ -542,12 +543,12 @@
                         </div>
 
                         <div class="rounded-2xl bg-purple-50 p-3">
-                            <p class="text-[10px] text-purple-700">Area kandidat model</p>
-                            <p class="mt-1 text-sm font-bold text-slate-800" x-text="selectedData.candidate_area"></p>
+                            <p class="text-sm text-purple-700">Area kandidat model</p>
+                            <p class="mt-1 text-base font-bold text-slate-800" x-text="selectedData.candidate_area"></p>
                         </div>
                         <div class="rounded-2xl bg-cyan-50 p-3">
-                            <p class="text-[10px] text-cyan-800">Kandidat tersaring</p>
-                            <p class="mt-1 text-sm font-bold text-slate-800" x-text="selectedData.candidate_doa_area"></p>
+                            <p class="text-sm text-cyan-800">Kandidat tersaring</p>
+                            <p class="mt-1 text-base font-bold text-slate-800" x-text="selectedData.candidate_doa_area"></p>
                         </div>
 
                     </div>
@@ -564,7 +565,7 @@
                            p-5"
                 >
 
-                    <p class="text-sm
+                    <p class="text-base
                               font-bold
                               text-slate-700
                               mb-4">
@@ -586,13 +587,13 @@
 
                             <div>
 
-                                <p class="text-xs
+                                <p class="text-sm
                                           font-semibold
                                           text-slate-600">
                                     Rendah
                                 </p>
 
-                                <p class="text-[10px]
+                                <p class="text-sm
                                           text-slate-400">
                                     Skor &lt; 0,35
                                 </p>
@@ -614,13 +615,13 @@
 
                             <div>
 
-                                <p class="text-xs
+                                <p class="text-sm
                                           font-semibold
                                           text-slate-600">
                                     Sedang
                                 </p>
 
-                                <p class="text-[10px]
+                                <p class="text-sm
                                           text-slate-400">
                                     Skor 0,35–0,69
                                 </p>
@@ -642,13 +643,13 @@
 
                             <div>
 
-                                <p class="text-xs
+                                <p class="text-sm
                                           font-semibold
                                           text-slate-600">
                                     Tinggi
                                 </p>
 
-                                <p class="text-[10px]
+                                <p class="text-sm
                                           text-slate-400">
                                     Skor ≥ 0,70
                                 </p>
@@ -671,7 +672,7 @@
                            p-5"
                 >
 
-                    <p class="text-sm
+                    <p class="text-base
                               font-bold
                               text-slate-700
                               mb-4">
@@ -687,12 +688,12 @@
                                    justify-between"
                         >
 
-                            <span class="text-xs
+                            <span class="text-sm
                                          text-slate-500">
                                 Area Valid
                             </span>
 
-                            <span class="text-xs
+                            <span class="text-sm
                                          font-bold
                                          text-slate-700">
                                 {{ $mapSummary['valid_area']['value'] }}
@@ -707,12 +708,12 @@
                                    justify-between"
                         >
 
-                            <span class="text-xs
+                            <span class="text-sm
                                          text-slate-500">
                                 Area kandidat (skor ≥ 0,50)
                             </span>
 
-                            <span class="text-xs
+                            <span class="text-sm
                                          font-bold
                                          text-slate-700">
                                 {{ $mapSummary['candidate_area']['value'] }}
@@ -727,12 +728,12 @@
                                    justify-between"
                         >
 
-                            <span class="text-xs
+                            <span class="text-sm
                                          text-slate-500">
                                 Kandidat setelah saringan spektral
                             </span>
 
-                            <span class="text-xs
+                            <span class="text-sm
                                          font-bold
                                          text-slate-700">
                                 {{ $mapSummary['candidate_doa_area']['value'] }}

@@ -2,15 +2,15 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div>
             <h2 class="text-xl sm:text-2xl font-bold text-brand-800">Hasil Penelitian Machine Learning</h2>
-            <p class="text-sm text-slate-600 mt-2">Model dilatih di Google Colab. Website membaca hasil pengolahan yang tersimpan; membuka halaman tidak menjalankan pelatihan ulang.</p>
+            <p class="text-base text-slate-600 mt-2">Model dilatih di Google Colab. Website membaca hasil pengolahan yang tersimpan; membuka halaman tidak menjalankan pelatihan ulang.</p>
         </div>
 
         {{-- Nilai yang tidak tersedia tetap ditandai kosong, bukan diganti angka perkiraan. --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <article class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3">
                 <h3 class="font-bold text-slate-900">Model pembuat peta</h3>
-                <p class="text-sm">{{ $researchResults['mapping']['Model'] ?? 'Data belum tersedia' }}</p>
-                <p class="text-sm text-slate-600">Balanced accuracy rata-rata:
+                <p class="text-base">{{ $researchResults['mapping']['Model'] ?? 'Data belum tersedia' }}</p>
+                <p class="text-base text-slate-600">Balanced accuracy rata-rata:
                     <strong>
                         @isset($researchResults['repeated']['Strict']['Balanced_Accuracy_Mean'])
                             {{ number_format($researchResults['repeated']['Strict']['Balanced_Accuracy_Mean'] * 100, 2, ',', '.') }}%
@@ -19,14 +19,14 @@
                         @endisset
                     </strong>
                 </p>
-                <p class="text-xs text-slate-600">Rata-rata kemampuan mengenali kedua kelas, bawang dan bukan bawang. Evaluasi memakai 10 pengulangan validasi 4 bagian berdasarkan kelompok lokasi.</p>
-                <p class="text-xs text-slate-500">Sumber: ringkasan pemetaan FASE 4B dan RepeatedCV V4.1.</p>
+                <p class="text-sm text-slate-600">Rata-rata kemampuan mengenali kedua kelas, bawang dan bukan bawang. Evaluasi memakai 10 pengulangan validasi 4 bagian berdasarkan kelompok lokasi.</p>
+                <p class="text-sm text-slate-500">Sumber: ringkasan pemetaan FASE 4B dan RepeatedCV V4.1.</p>
             </article>
 
             <article class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3">
                 <h3 class="font-bold text-slate-900">Model pembanding SELECTED</h3>
-                <p class="text-sm">Dataset: {{ $researchResults['selected']['Selected_Dataset'] ?? 'Data belum tersedia' }}</p>
-                <p class="text-sm text-slate-600">Accuracy validasi awal:
+                <p class="text-base">Dataset: {{ $researchResults['selected']['Selected_Dataset'] ?? 'Data belum tersedia' }}</p>
+                <p class="text-base text-slate-600">Accuracy validasi awal:
                     <strong>
                         @isset($researchResults['selected']['Selected_Metrics']['Accuracy'])
                             {{ number_format($researchResults['selected']['Selected_Metrics']['Accuracy'] * 100, 2, ',', '.') }}%
@@ -35,8 +35,8 @@
                         @endisset
                     </strong>
                 </p>
-                <p class="text-xs text-slate-600">Proporsi prediksi yang benar pada validasi 4 bagian. Tahap perbandingan awal memilih EXTENDED; evaluasi berulang berikutnya merekomendasikan STRICT untuk pemetaan. Angka kedua kartu berasal dari prosedur evaluasi yang berbeda.</p>
-                <p class="text-xs text-slate-500">Sumber: metadata XGBoost V4.1 SELECTED.</p>
+                <p class="text-sm text-slate-600">Proporsi prediksi yang benar pada validasi 4 bagian. Tahap perbandingan awal memilih EXTENDED; evaluasi berulang berikutnya merekomendasikan STRICT untuk pemetaan. Angka kedua kartu berasal dari prosedur evaluasi yang berbeda.</p>
+                <p class="text-sm text-slate-500">Sumber: metadata XGBoost V4.1 SELECTED.</p>
             </article>
 
             <article class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3">
@@ -48,14 +48,14 @@
                         Data belum tersedia
                     @endisset
                 </p>
-                <p class="text-xs text-slate-600">Total empat kecamatan pada ambang probabilitas 0,50. DOA menyaring kandidat berdasarkan kemiripan fitur dengan referensi positif. Luas ini merupakan estimasi kandidat, bukan luas panen resmi atau kepastian tanaman di lapangan.</p>
-                <p class="text-xs text-slate-500">Sumber: FASE_4D_DOA_Summary.json.</p>
+                <p class="text-sm text-slate-600">Total empat kecamatan pada ambang probabilitas 0,50. DOA menyaring kandidat berdasarkan kemiripan fitur dengan referensi positif. Luas ini merupakan estimasi kandidat, bukan luas panen resmi atau kepastian tanaman di lapangan.</p>
+                <p class="text-sm text-slate-500">Sumber: FASE_4D_DOA_Summary.json.</p>
             </article>
         </div>
 
         <details class="bg-white border border-slate-200 rounded-2xl p-5">
             <summary class="font-bold text-slate-900 cursor-pointer">Mengenal data penelitian</summary>
-            <dl class="mt-4 space-y-4 text-sm text-slate-600">
+            <dl class="mt-4 space-y-4 text-base text-slate-600">
                 <div><dt class="font-semibold text-slate-900">Dataset STRICT dan EXTENDED (.csv)</dt><dd>Contoh lokasi dengan label bawang atau bukan bawang dan delapan fitur Sentinel-2. File ini menjadi bahan pelatihan, bukan hasil prediksi peta. Sebagian referensi negatif berasal dari Dynamic World dan belum merupakan verifikasi lapangan independen.</dd></div>
                 <div><dt class="font-semibold text-slate-900">Model XGBoost (.json)</dt><dd>Hasil pelatihan yang menyimpan aturan prediksi. STRICT FINAL digunakan untuk peta; SELECTED menyimpan model EXTENDED dari perbandingan awal. Model produktivitas disimpan terpisah dalam YIELD_PREDICTION.</dd></div>
                 <div><dt class="font-semibold text-slate-900">FeatureStack (.tif)</dt><dd>Kumpulan fitur citra yang menjadi masukan model saat pemetaan di Colab.</dd></div>

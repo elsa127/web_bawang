@@ -1294,36 +1294,6 @@ class DashboardController extends Controller
                 $mlPath.'/YIELD_PREDICTION/Yield_Temporal_CV_Prediction.csv'
             ),
 
-            'dataset_ml' => is_file(
-                $mlPath
-                .'/dataset_ml_nganjuk_v4.csv'
-            ),
-
-            'dataset_qc' => is_file(
-                $mlPath
-                .'/dataset_ml_nganjuk_v4_qc.csv'
-            ),
-
-            'dataset_strict' => is_file(
-                $mlPath
-                .'/dataset_ml_nganjuk_v4_1_STRICT.csv'
-            ),
-
-            'dataset_extended' => is_file(
-                $mlPath
-                .'/dataset_ml_nganjuk_v4_1_EXTENDED.csv'
-            ),
-
-            'feature_stack_2025' => is_file(
-                $mlPath
-                .'/FeatureStack_Nganjuk_2025.tif'
-            ),
-
-            'feature_stack_final' => is_file(
-                $mlPath
-                .'/FeatureStack_Nganjuk_V3_FINAL.tif'
-            ),
-
             'mapping_summary' => is_file($mappingPath),
 
             'probability_tif' => $this->mapAssetPath('probability') !== null,
@@ -1556,7 +1526,7 @@ class DashboardController extends Controller
             }
             $relative = str_replace('\\', '/', substr($path, strlen(base_path()) + 1));
             $source = $manifest['sources'][$relative] ?? [];
-            if (($source['mtime'] ?? null) !== filemtime($path) || ($source['size'] ?? null) !== filesize($path)) {
+            if (($source['sha256'] ?? null) !== hash_file('sha256', $path) || ($source['size'] ?? null) !== filesize($path)) {
                 return [];
             }
         }

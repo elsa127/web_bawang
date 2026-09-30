@@ -2,3 +2,7 @@
 !private/
 !public/
 !.gitignore
+
+!map-overlays/
+!map-overlays/manifest.json
+!map-overlays/overlay_*.png

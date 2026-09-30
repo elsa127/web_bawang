@@ -51,10 +51,10 @@
                 <div class="flex flex-col">
                     <span class="text-xs font-medium text-slate-500">{{ $kpiSummary[2]['title'] }}</span>
                     <span class="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-                        {{ $kpiSummary[2]['value'] ?? 'Fase Vegetatif' }}
+                        {{ $kpiSummary[2]['value'] ?? 'Data belum tersedia' }}
                     </span>
                     <span class="text-xs text-brand-800 font-medium mt-0.5">
-                        {{ $kpiSummary[2]['subtitle'] ?? 'Estimasi Musim Tanam 2026' }}
+                        {{ $kpiSummary[2]['subtitle'] ?? 'Data belum tersedia' }}
                     </span>
                 </div>
             </div>
@@ -70,10 +70,10 @@
                 <div class="flex flex-col">
                     <span class="text-xs font-medium text-slate-500">{{ $kpiSummary[3]['title'] }}</span>
                     <span class="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-                        {{ $kpiSummary[3]['value'] ?? 'Siram Pagi Hari' }}
+                        {{ $kpiSummary[3]['value'] ?? 'Data belum tersedia' }}
                     </span>
                     <span class="text-xs text-amber-700 font-medium mt-0.5">
-                        {{ $kpiSummary[3]['subtitle'] ?? 'Kelembapan SWIR-2 Terjaga' }}
+                        {{ $kpiSummary[3]['subtitle'] ?? 'Data belum tersedia' }}
                     </span>
                 </div>
             </div>

@@ -7,7 +7,7 @@
                 <h2>Tentang Sistem SI Bawang Merah</h2>
             </div>
             <p class="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
-                Sistem ini membantu petani, penyuluh, dan pengambil kebijakan melihat kondisi lahan bawang merah secara transparan, menganalisis kondisi tanaman secara berkala, memprediksi produktivitas panen, dan mempercepat pembuatan keputusan yang tepat guna.
+                Sistem ini menampilkan peta area kandidat bawang merah dan hasil penelitian Sentinel-2 serta XGBoost di empat kecamatan Nganjuk. Informasi mengikuti periode data penelitian yang tersedia.
             </p>
         </div>
 
@@ -25,7 +25,7 @@
                     Citra Satelit Sentinel-2
                 </h4>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    Data citra satelit multispektral resolusi tinggi untuk memantau indeks vegetasi klorofil daun dan kelembapan lahan secara berkala langsung dari orbit bumi.
+                    Citra Sentinel-2 diolah menjadi fitur spektral, termasuk NDVI dan NDWI. Nilai yang ditampilkan berasal dari hasil pengolahan penelitian yang tersimpan.
                 </p>
             </div>
 
@@ -40,7 +40,7 @@
                     Algoritma XGBoost
                 </h4>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    Hasil machine learning cerdas yang memproses histori pola cuaca, indeks satelit, dan NDVI untuk menghasilkan perkiraan panen dengan akurasi tinggi.
+                    Model klasifikasi mengenali kandidat bawang merah dari delapan fitur Sentinel-2. Model regresi produktivitas dievaluasi secara terpisah pada data kecamatan-tahun.
                 </p>
             </div>
 
@@ -52,10 +52,10 @@
                     </svg>
                 </div>
                 <h4 class="text-sm sm:text-base font-bold text-slate-900 leading-snug">
-                    Validasi Tim Lapangan
+                    Evaluasi Model
                 </h4>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    Pengujian model secara berkala bersama kelompok tani lokal untuk memastikan seluruh angka prediksi dan rekomendasi selalu dapat diandalkan di sawah nyata.
+                    Validasi klasifikasi dikelompokkan berdasarkan lokasi. Referensi negatif dari Dynamic World merupakan referensi semu; konfirmasi lapangan tetap diperlukan untuk menilai kandidat hasil pemetaan.
                 </p>
             </div>
 
@@ -67,10 +67,10 @@
                     </svg>
                 </div>
                 <h4 class="text-sm sm:text-base font-bold text-slate-900 leading-snug">
-                    Panduan Agronomi Nyata
+                    Batas Penggunaan
                 </h4>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    Memberikan saran tindakan teknis pertanian praktis seperti jadwal siram, takaran pupuk susulan, dan pencegahan hama ulat grayak tanpa spekulasi.
+                    Hasil penelitian membantu peninjauan awal wilayah kandidat. Dataset yang tersedia belum menentukan jadwal siram, dosis pupuk, serangan hama, maupun fase tanam per lahan.
                 </p>
             </div>
 

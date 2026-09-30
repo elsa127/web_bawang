@@ -7,7 +7,7 @@
                 <!-- Status Badge -->
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-100/80 border border-rose-200/90 text-brand-900 text-xs sm:text-sm font-semibold tracking-wide">
                     <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                    <span>Musim Tanam Aktif 2026</span>
+                    <span>Hasil Penelitian Nganjuk 2023–2025</span>
                 </div>
 
                 <!-- Main Headline -->

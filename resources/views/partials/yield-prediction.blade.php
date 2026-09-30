@@ -7,7 +7,7 @@
                 <h2>Prediksi Produktivitas Panen</h2>
             </div>
             <p class="text-slate-600 text-xs sm:text-sm mt-1 max-w-2xl">
-                Lihat tren estimasi panen bawang merah berdasarkan model data historis dan kondisi cuaca saat ini.
+                Bandingkan produktivitas BPS dengan prediksi validasi model untuk Sukomoro pada 2023–2025.
             </p>
         </div>
 
@@ -33,7 +33,7 @@
                 <!-- Right Big Projected Box -->
                 <div class="bg-brand-800 text-white rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center shadow-lg min-w-[240px] shrink-0 border border-brand-700">
                     <span class="text-xs uppercase tracking-wider font-semibold text-rose-200">
-                        Perkiraan Hasil Panen
+                        Prediksi Validasi 2025
                     </span>
                     <span class="text-5xl sm:text-6xl font-extrabold tracking-tight my-1">
                         {{ $yieldPrediction['projected_yield'] }}
@@ -56,7 +56,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
                         <h3 class="text-sm sm:text-base font-bold text-slate-900">Perbandingan Hasil Produktivitas</h3>
-                        <span class="text-xs text-slate-500 font-medium">Perbandingan tren aktual dengan estimasi per musim tanam</span>
+                        <span class="text-xs text-slate-500 font-medium">Data BPS dan prediksi uji antar tahun, dalam ton/ha</span>
                     </div>
 
                     <!-- Legend -->
@@ -107,7 +107,7 @@
                 </div>
 
                 <p class="text-[11px] text-slate-400 leading-relaxed pt-2 border-t border-slate-100">
-                    *Rerata grafik panen berbobot dibandingkan terhadap data historis hasil panen riil petani dan granulasi model sistem cerdas.
+                    *Setiap prediksi dibuat saat tahun tersebut dikeluarkan dari data latih (Leave-One-Year-Out). Batang hanya membantu perbandingan visual.
                 </p>
             </div>
 
@@ -121,11 +121,8 @@
                     <!-- Accuracy Level Bar -->
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between text-xs font-bold">
-                            <span class="text-slate-700">Akurasi Sistem (1 - MAPE)</span>
+                            <span class="text-slate-700">MAPE validasi antar tahun (lebih kecil lebih baik)</span>
                             <span class="text-emerald-700 font-extrabold text-sm">{{ $yieldPrediction['model_accuracy']['rate'] }}</span>
-                        </div>
-                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                            <div class="bg-emerald-600 h-full rounded-full" style="width: {{ $yieldPrediction['model_accuracy']['rate'] }}"></div>
                         </div>
                     </div>
 
@@ -150,7 +147,7 @@
                     </p>
                 </div>
 
-                <!-- Card: Selisih Sangat Minim -->
+                <!-- Catatan batas penggunaan model -->
                 <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4.5 sm:p-5 flex items-start gap-3.5">
                     <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,9 +155,9 @@
                         </svg>
                     </div>
                     <div>
-                        <h4 class="text-xs sm:text-sm font-bold text-emerald-950">Selisih Sangat Minim</h4>
+                        <h4 class="text-xs sm:text-sm font-bold text-emerald-950">Batas Hasil Model</h4>
                         <p class="text-xs text-emerald-900/80 leading-relaxed mt-1">
-                            Grafik menunjukkan kesesuaian antara model data prediksi vs data aktual pada rentang yang sangat kecil (±0.2 Ton) dan menandakan proyeksi model dapat diandalkan.
+                            Model dilatih dari 12 data kecamatan–tahun. Validasi ke kecamatan yang tidak dilatih masih memiliki R² negatif; hasil ini belum menjadi prakiraan panen 2026 atau prediksi per petak.
                         </p>
                     </div>
                 </div>
@@ -209,10 +206,10 @@
                         </svg>
                     </div>
                     <div class="space-y-1">
-                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Unduh Hasil Lapangan</span>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Ringkasan Penelitian</span>
                         <h3 class="text-base sm:text-lg font-bold text-slate-900">Laporan Analisis Lengkap</h3>
                         <p class="text-xs text-slate-600 leading-relaxed max-w-2xl">
-                            Simpan hasil analisis kondisi tanaman dan prediksi produktivitas sebagai dokumen laporan PDF resmi untuk dinas, mingguan kelompok tani, atau disimpan di HP.
+                            Simpan ringkasan data penelitian 2023–2025 dan metrik validasi sebagai PDF melalui menu cetak browser.
                         </p>
                     </div>
                 </div>

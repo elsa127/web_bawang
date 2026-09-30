@@ -16,7 +16,7 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('SI BAWANG MERAH');
         $response->assertSee('Pantau Kondisi Lahan');
-        $response->assertSee('Peta Lahan Bawang Merah');
+        $response->assertSee('Peta Kandidat Bawang Merah');
         $response->assertSee('Sukomoro');
         $response->assertSee('Citra Satelit Sentinel-2');
         $response->assertSee('Algoritma XGBoost');
@@ -32,7 +32,7 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
 
         // Nilai produktivitas prediksi XGBoost harus konsisten di seluruh halaman
-        $response->assertSee('10.97');
+        $response->assertSee('10,966');
 
         // Tidak boleh ada nilai lama yang salah
         $response->assertDontSee('>8.2 Ton/Ha<');
@@ -48,12 +48,13 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
 
         // MAE dan RMSE sesuai temporal CV dari Colab
-        $response->assertSee('0.88');
-        $response->assertSee('1.16');
+        $response->assertSee('0,883');
+        $response->assertSee('1,163');
         $response->assertSee('MAPE');
 
-        // R² yang benar (0.23), bukan nilai salah lama (0.91)
-        $response->assertSee('0.23');
+        // R² yang benar (0.228), bukan nilai salah lama (0.91)
+        $response->assertViewHas('yieldPrediction', fn (array $prediction): bool => $prediction['model_accuracy']['r_score'] === '0.228');
+        $response->assertSee('0,228');
         $response->assertDontSee('>0.91<');
     }
 

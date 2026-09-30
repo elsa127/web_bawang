@@ -91,7 +91,9 @@
     </style>
 </head>
 <body class="bg-[#FAF6F4] text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-700 selection:text-white"
+      @district-changed.window="reportDistrict = $event.detail"
       x-data="{
+          reportDistrict: @js($activeDistrict),
           activeSection: 'beranda',
           selectedDistrict: 'Sukomoro',
           selectedParcelId: 'sukomoro',
